@@ -1,4 +1,4 @@
-package iabtcf
+package iabtcfv2
 
 import (
 	"time"

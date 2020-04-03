@@ -1,4 +1,4 @@
-package iabtcf
+package iabtcfv2
 
 import (
 	"encoding/base64"
@@ -31,7 +31,7 @@ func Decode(s string) (t *TCData, err error) {
 				t.AllowedVendors = segment
 			}
 		} else if segmentType == 3 {
-			segment, err := DecodePubllisherTC(v)
+			segment, err := DecodePublisherTC(v)
 			if err == nil {
 				t.PublisherTC = segment
 			}
@@ -165,14 +165,13 @@ func DecodeAllowedVendors(s string) (a *AllowedVendors, err error) {
 	}
 
 	if a.SegmentType != 2 {
-		err = fmt.Errorf("allowed vendors segment type must be 2")
-		return nil, err
+		return nil, fmt.Errorf("allowed vendors segment type must be 2")
 	}
 
 	return a, nil
 }
 
-func DecodePubllisherTC(s string) (p *PublisherTC, err error) {
+func DecodePublisherTC(s string) (p *PublisherTC, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
@@ -195,8 +194,7 @@ func DecodePubllisherTC(s string) (p *PublisherTC, err error) {
 	p.CustomPurposesLITransparency = e.readBitField(uint(p.NumCustomPurposes))
 
 	if p.SegmentType != 3 {
-		err = fmt.Errorf("allowed vendors segment type must be 3")
-		return nil, err
+		return nil, fmt.Errorf("allowed vendors segment type must be 3")
 	}
 
 	return p, nil
