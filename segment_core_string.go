@@ -133,58 +133,58 @@ func (c *CoreString) Encode() string {
 		bitSize += entriesSize
 	}
 
-	var e = NewTCEncoder(make([]byte, bitSize/8))
+	var e = newTCEncoder(make([]byte, bitSize/8))
 	if bitSize%8 != 0 {
-		e = NewTCEncoder(make([]byte, bitSize/8+1))
+		e = newTCEncoder(make([]byte, bitSize/8+1))
 	}
 
-	e.WriteInt(c.Version, 6)
-	e.WriteTime(c.Created)
-	e.WriteTime(c.LastUpdated)
-	e.WriteInt(c.CmpId, 12)
-	e.WriteInt(c.CmpVersion, 12)
-	e.WriteInt(c.ConsentScreen, 6)
-	e.WriteIsoCode(c.ConsentLanguage)
-	e.WriteInt(c.VendorListVersion, 12)
-	e.WriteInt(c.TcfPolicyVersion, 6)
-	e.WriteBool(c.IsServiceSpecific)
-	e.WriteBool(c.UseNonStandardStacks)
+	e.writeInt(c.Version, 6)
+	e.writeTime(c.Created)
+	e.writeTime(c.LastUpdated)
+	e.writeInt(c.CmpId, 12)
+	e.writeInt(c.CmpVersion, 12)
+	e.writeInt(c.ConsentScreen, 6)
+	e.writeIsoCode(c.ConsentLanguage)
+	e.writeInt(c.VendorListVersion, 12)
+	e.writeInt(c.TcfPolicyVersion, 6)
+	e.writeBool(c.IsServiceSpecific)
+	e.writeBool(c.UseNonStandardStacks)
 	for i := 0; i < 12; i++ {
-		e.WriteBool(c.IsSpecialFeatureAllowed(i + 1))
+		e.writeBool(c.IsSpecialFeatureAllowed(i + 1))
 	}
 	for i := 0; i < 24; i++ {
-		e.WriteBool(c.IsPurposeAllowed(i + 1))
+		e.writeBool(c.IsPurposeAllowed(i + 1))
 	}
 	for i := 0; i < 24; i++ {
-		e.WriteBool(c.IsPurposeLIAllowed(i + 1))
+		e.writeBool(c.IsPurposeLIAllowed(i + 1))
 	}
-	e.WriteBool(c.PurposeOneTreatment)
-	e.WriteIsoCode(c.PublisherCC)
+	e.writeBool(c.PurposeOneTreatment)
+	e.writeIsoCode(c.PublisherCC)
 
-	e.WriteInt(c.MaxVendorId, 16)
-	e.WriteBool(c.IsRangeEncoding)
+	e.writeInt(c.MaxVendorId, 16)
+	e.writeBool(c.IsRangeEncoding)
 	if c.IsRangeEncoding {
-		e.WriteInt(len(c.RangeEntries), 12)
-		e.WriteRangeEntries(c.RangeEntries)
+		e.writeInt(len(c.RangeEntries), 12)
+		e.writeRangeEntries(c.RangeEntries)
 	} else {
 		for i := 0; i < c.MaxVendorId; i++ {
-			e.WriteBool(c.IsVendorAllowed(i + 1))
+			e.writeBool(c.IsVendorAllowed(i + 1))
 		}
 	}
 
-	e.WriteInt(c.MaxVendorIdLI, 16)
-	e.WriteBool(c.IsRangeEncodingLI)
+	e.writeInt(c.MaxVendorIdLI, 16)
+	e.writeBool(c.IsRangeEncodingLI)
 	if c.IsRangeEncodingLI {
-		e.WriteInt(len(c.RangeEntriesLI), 12)
-		e.WriteRangeEntries(c.RangeEntriesLI)
+		e.writeInt(len(c.RangeEntriesLI), 12)
+		e.writeRangeEntries(c.RangeEntriesLI)
 	} else {
 		for i := 0; i < c.MaxVendorIdLI; i++ {
-			e.WriteBool(c.IsVendorLIAllowed(i + 1))
+			e.writeBool(c.IsVendorLIAllowed(i + 1))
 		}
 	}
 
-	e.WriteInt(len(c.PubRestrictions), 12)
-	e.WritePubRestrictions(c.PubRestrictions)
+	e.writeInt(len(c.PubRestrictions), 12)
+	e.writePubRestrictions(c.PubRestrictions)
 
 	return base64.RawURLEncoding.EncodeToString(e.bytes)
 }

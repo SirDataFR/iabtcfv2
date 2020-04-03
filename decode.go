@@ -12,8 +12,8 @@ func DecodeSegmentType(s string) int {
 		return 0
 	}
 
-	var e = NewTCEncoder(b)
-	return e.ReadInt(3)
+	var e = newTCEncoder(b)
+	return e.readInt(3)
 }
 
 func Decode(s string) (t *TCData, err error) {
@@ -62,46 +62,46 @@ func DecodeCoreString(s string) (c *CoreString, err error) {
 		return nil, err
 	}
 
-	var e = NewTCEncoder(b)
+	var e = newTCEncoder(b)
 
 	c = &CoreString{}
-	c.Version = e.ReadInt(6)
-	c.Created = e.ReadTime()
-	c.LastUpdated = e.ReadTime()
-	c.CmpId = e.ReadInt(12)
-	c.CmpVersion = e.ReadInt(12)
-	c.ConsentScreen = e.ReadInt(6)
-	c.ConsentLanguage = e.ReadIsoCode()
-	c.VendorListVersion = e.ReadInt(12)
-	c.TcfPolicyVersion = e.ReadInt(6)
-	c.IsServiceSpecific = e.ReadBool()
-	c.UseNonStandardStacks = e.ReadBool()
-	c.SpecialFeatureOptIns = e.ReadBitField(12)
-	c.PurposesConsent = e.ReadBitField(24)
-	c.PurposesLITransparency = e.ReadBitField(24)
-	c.PurposeOneTreatment = e.ReadBool()
-	c.PublisherCC = e.ReadIsoCode()
+	c.Version = e.readInt(6)
+	c.Created = e.readTime()
+	c.LastUpdated = e.readTime()
+	c.CmpId = e.readInt(12)
+	c.CmpVersion = e.readInt(12)
+	c.ConsentScreen = e.readInt(6)
+	c.ConsentLanguage = e.readIsoCode()
+	c.VendorListVersion = e.readInt(12)
+	c.TcfPolicyVersion = e.readInt(6)
+	c.IsServiceSpecific = e.readBool()
+	c.UseNonStandardStacks = e.readBool()
+	c.SpecialFeatureOptIns = e.readBitField(12)
+	c.PurposesConsent = e.readBitField(24)
+	c.PurposesLITransparency = e.readBitField(24)
+	c.PurposeOneTreatment = e.readBool()
+	c.PublisherCC = e.readIsoCode()
 
-	c.MaxVendorId = e.ReadInt(16)
-	c.IsRangeEncoding = e.ReadBool()
+	c.MaxVendorId = e.readInt(16)
+	c.IsRangeEncoding = e.readBool()
 	if c.IsRangeEncoding {
-		c.NumEntries = e.ReadInt(12)
-		c.RangeEntries = e.ReadRangeEntries(uint(c.NumEntries))
+		c.NumEntries = e.readInt(12)
+		c.RangeEntries = e.readRangeEntries(uint(c.NumEntries))
 	} else {
-		c.VendorsConsent = e.ReadBitField(uint(c.MaxVendorId))
+		c.VendorsConsent = e.readBitField(uint(c.MaxVendorId))
 	}
 
-	c.MaxVendorIdLI = e.ReadInt(16)
-	c.IsRangeEncodingLI = e.ReadBool()
+	c.MaxVendorIdLI = e.readInt(16)
+	c.IsRangeEncodingLI = e.readBool()
 	if c.IsRangeEncodingLI {
-		c.NumEntriesLI = e.ReadInt(12)
-		c.RangeEntriesLI = e.ReadRangeEntries(uint(c.NumEntriesLI))
+		c.NumEntriesLI = e.readInt(12)
+		c.RangeEntriesLI = e.readRangeEntries(uint(c.NumEntriesLI))
 	} else {
-		c.VendorsLITransparency = e.ReadBitField(uint(c.MaxVendorIdLI))
+		c.VendorsLITransparency = e.readBitField(uint(c.MaxVendorIdLI))
 	}
 
-	c.NumPubRestrictions = e.ReadInt(12)
-	c.PubRestrictions = e.ReadPubRestrictions(uint(c.NumPubRestrictions))
+	c.NumPubRestrictions = e.readInt(12)
+	c.PubRestrictions = e.readPubRestrictions(uint(c.NumPubRestrictions))
 
 	return c, nil
 }
@@ -118,17 +118,17 @@ func DecodeDisclosedVendors(s string) (d *DisclosedVendors, err error) {
 		return nil, err
 	}
 
-	var e = NewTCEncoder(b)
+	var e = newTCEncoder(b)
 
 	d = &DisclosedVendors{}
-	d.SegmentType = e.ReadInt(3)
-	d.MaxVendorId = e.ReadInt(16)
-	d.IsRangeEncoding = e.ReadBool()
+	d.SegmentType = e.readInt(3)
+	d.MaxVendorId = e.readInt(16)
+	d.IsRangeEncoding = e.readBool()
 	if d.IsRangeEncoding {
-		d.NumEntries = e.ReadInt(12)
-		d.RangeEntries = e.ReadRangeEntries(uint(d.NumEntries))
+		d.NumEntries = e.readInt(12)
+		d.RangeEntries = e.readRangeEntries(uint(d.NumEntries))
 	} else {
-		d.DisclosedVendors = e.ReadBitField(uint(d.MaxVendorId))
+		d.DisclosedVendors = e.readBitField(uint(d.MaxVendorId))
 	}
 
 	if d.SegmentType != 1 {
@@ -151,17 +151,17 @@ func DecodeAllowedVendors(s string) (a *AllowedVendors, err error) {
 		return nil, err
 	}
 
-	var e = NewTCEncoder(b)
+	var e = newTCEncoder(b)
 
 	a = &AllowedVendors{}
-	a.SegmentType = e.ReadInt(3)
-	a.MaxVendorId = e.ReadInt(16)
-	a.IsRangeEncoding = e.ReadBool()
+	a.SegmentType = e.readInt(3)
+	a.MaxVendorId = e.readInt(16)
+	a.IsRangeEncoding = e.readBool()
 	if a.IsRangeEncoding {
-		a.NumEntries = e.ReadInt(12)
-		a.RangeEntries = e.ReadRangeEntries(uint(a.NumEntries))
+		a.NumEntries = e.readInt(12)
+		a.RangeEntries = e.readRangeEntries(uint(a.NumEntries))
 	} else {
-		a.AllowedVendors = e.ReadBitField(uint(a.MaxVendorId))
+		a.AllowedVendors = e.readBitField(uint(a.MaxVendorId))
 	}
 
 	if a.SegmentType != 2 {
@@ -184,15 +184,15 @@ func DecodePubllisherTC(s string) (p *PublisherTC, err error) {
 		return nil, err
 	}
 
-	var e = NewTCEncoder(b)
+	var e = newTCEncoder(b)
 
 	p = &PublisherTC{}
-	p.SegmentType = e.ReadInt(3)
-	p.PubPurposesConsent = e.ReadBitField(24)
-	p.PubPurposesLITransparency = e.ReadBitField(24)
-	p.NumCustomPurposes = e.ReadInt(6)
-	p.CustomPurposesConsent = e.ReadBitField(uint(p.NumCustomPurposes))
-	p.CustomPurposesLITransparency = e.ReadBitField(uint(p.NumCustomPurposes))
+	p.SegmentType = e.readInt(3)
+	p.PubPurposesConsent = e.readBitField(24)
+	p.PubPurposesLITransparency = e.readBitField(24)
+	p.NumCustomPurposes = e.readInt(6)
+	p.CustomPurposesConsent = e.readBitField(uint(p.NumCustomPurposes))
+	p.CustomPurposesLITransparency = e.readBitField(uint(p.NumCustomPurposes))
 
 	if p.SegmentType != 3 {
 		err = fmt.Errorf("allowed vendors segment type must be 3")

@@ -44,20 +44,20 @@ func (d *DisclosedVendors) Encode() string {
 		bitSize += d.MaxVendorId
 	}
 
-	var e = NewTCEncoder(make([]byte, bitSize/8))
+	var e = newTCEncoder(make([]byte, bitSize/8))
 	if bitSize%8 != 0 {
-		e = NewTCEncoder(make([]byte, bitSize/8+1))
+		e = newTCEncoder(make([]byte, bitSize/8+1))
 	}
 
-	e.WriteInt(d.SegmentType, 3)
-	e.WriteInt(d.MaxVendorId, 16)
-	e.WriteBool(d.IsRangeEncoding)
+	e.writeInt(d.SegmentType, 3)
+	e.writeInt(d.MaxVendorId, 16)
+	e.writeBool(d.IsRangeEncoding)
 	if d.IsRangeEncoding {
-		e.WriteInt(len(d.RangeEntries), 12)
-		e.WriteRangeEntries(d.RangeEntries)
+		e.writeInt(len(d.RangeEntries), 12)
+		e.writeRangeEntries(d.RangeEntries)
 	} else {
 		for i := 0; i < d.MaxVendorId; i++ {
-			e.WriteBool(d.IsVendorDisclosed(i + 1))
+			e.writeBool(d.IsVendorDisclosed(i + 1))
 		}
 	}
 

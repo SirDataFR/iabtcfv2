@@ -30,24 +30,24 @@ func (p *PublisherTC) IsCustomPurposeLIAllowed(id int) bool {
 func (p *PublisherTC) Encode() string {
 	bitSize := 57 + (p.NumCustomPurposes * 2)
 
-	var e = NewTCEncoder(make([]byte, bitSize/8))
+	var e = newTCEncoder(make([]byte, bitSize/8))
 	if bitSize%8 != 0 {
-		e = NewTCEncoder(make([]byte, bitSize/8+1))
+		e = newTCEncoder(make([]byte, bitSize/8+1))
 	}
 
-	e.WriteInt(p.SegmentType, 3)
+	e.writeInt(p.SegmentType, 3)
 	for i := 0; i < 24; i++ {
-		e.WriteBool(p.IsPurposeAllowed(i + 1))
+		e.writeBool(p.IsPurposeAllowed(i + 1))
 	}
 	for i := 0; i < 24; i++ {
-		e.WriteBool(p.IsPurposeLIAllowed(i + 1))
+		e.writeBool(p.IsPurposeLIAllowed(i + 1))
 	}
-	e.WriteInt(p.NumCustomPurposes, 6)
+	e.writeInt(p.NumCustomPurposes, 6)
 	for i := 0; i < p.NumCustomPurposes; i++ {
-		e.WriteBool(p.IsCustomPurposeAllowed(i + 1))
+		e.writeBool(p.IsCustomPurposeAllowed(i + 1))
 	}
 	for i := 0; i < p.NumCustomPurposes; i++ {
-		e.WriteBool(p.IsCustomPurposeLIAllowed(i + 1))
+		e.writeBool(p.IsCustomPurposeLIAllowed(i + 1))
 	}
 
 	return base64.RawURLEncoding.EncodeToString(e.bytes)

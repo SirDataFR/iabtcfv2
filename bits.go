@@ -9,11 +9,11 @@ var (
 	bytePows = []byte{128, 64, 32, 16, 8, 4, 2, 1}
 )
 
-func NewBits(bytes []byte) *Bits {
+func newBits(bytes []byte) *Bits {
 	return &Bits{bytes: bytes, position: 0}
 }
 
-func (b *Bits) ReadBool() bool {
+func (b *Bits) readBool() bool {
 	byteIndex := b.position / 8
 	bitIndex := b.position % 8
 	b.position++
@@ -21,7 +21,7 @@ func (b *Bits) ReadBool() bool {
 	return (b.bytes[byteIndex] & bytePows[bitIndex]) != 0
 }
 
-func (b *Bits) WriteBool(v bool) {
+func (b *Bits) writeBool(v bool) {
 	byteIndex := b.position / 8
 	shift := (byteIndex+1)*8 - b.position - 1
 	b.position++
@@ -33,10 +33,10 @@ func (b *Bits) WriteBool(v bool) {
 	}
 }
 
-func (b *Bits) ReadInt(n uint) int {
+func (b *Bits) readInt(n uint) int {
 	v := 0
 	for i, shift := uint(0), n-1; i < n; i++ {
-		if b.ReadBool() {
+		if b.readBool() {
 			v += 1 << uint(shift)
 		}
 		shift--
@@ -45,11 +45,11 @@ func (b *Bits) ReadInt(n uint) int {
 	return v
 }
 
-func (b *Bits) WriteInt(v int, n uint) {
-	b.WriteNumber(int64(v), n)
+func (b *Bits) writeInt(v int, n uint) {
+	b.writeNumber(int64(v), n)
 }
 
-func (b *Bits) WriteNumber(v int64, n uint) {
+func (b *Bits) writeNumber(v int64, n uint) {
 	startOffset := int(b.position)
 	for i := int(n) - 1; i >= 0; i-- {
 		index := startOffset + i
