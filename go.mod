@@ -1,3 +1,3 @@
-module github.com/SirDataFR/iab-tcf-v2
+module github.com/SirDataFR/iabtcfv2
 
 go 1.13
