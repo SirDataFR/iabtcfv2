@@ -1,14 +1,15 @@
-package iabtcf
+package iabtcf_test
 
 import (
+	iabtcf "github.com/SirDataFR/iab-tcf-v2"
 	"testing"
 	"time"
 )
 
 func TestEncode(t *testing.T) {
 	str := "COxSKBCOxSKCCBcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA.IDaQBQAMgAgABqAR0A2g.QF3QAgABAA1A.eEAAAAAAAUA"
-	data := &TCData{
-		CoreString: &CoreString{
+	data := &iabtcf.TCData{
+		CoreString: &iabtcf.CoreString{
 			Version:              2,
 			Created:              timeFromDeciSeconds(15859228738),
 			LastUpdated:          timeFromDeciSeconds(15859228802),
@@ -47,7 +48,7 @@ func TestEncode(t *testing.T) {
 			IsRangeEncoding:     true,
 			VendorsConsent:      map[int]bool{},
 			NumEntries:          5,
-			RangeEntries: []*RangeEntry{
+			RangeEntries: []*iabtcf.RangeEntry{
 				{
 					StartVendorID: 25,
 					EndVendorID:   25,
@@ -73,7 +74,7 @@ func TestEncode(t *testing.T) {
 			IsRangeEncodingLI:     true,
 			VendorsLITransparency: map[int]bool{},
 			NumEntriesLI:          3,
-			RangeEntriesLI: []*RangeEntry{
+			RangeEntriesLI: []*iabtcf.RangeEntry{
 				{
 					StartVendorID: 25,
 					EndVendorID:   25,
@@ -89,12 +90,12 @@ func TestEncode(t *testing.T) {
 			},
 			NumPubRestrictions: 0,
 		},
-		DisclosedVendors: &DisclosedVendors{
+		DisclosedVendors: &iabtcf.DisclosedVendors{
 			SegmentType:     1,
 			MaxVendorId:     436,
 			IsRangeEncoding: true,
 			NumEntries:      5,
-			RangeEntries: []*RangeEntry{
+			RangeEntries: []*iabtcf.RangeEntry{
 				{
 					StartVendorID: 25,
 					EndVendorID:   25,
@@ -117,12 +118,12 @@ func TestEncode(t *testing.T) {
 				},
 			},
 		},
-		AllowedVendors: &AllowedVendors{
+		AllowedVendors: &iabtcf.AllowedVendors{
 			SegmentType:     2,
 			MaxVendorId:     750,
 			IsRangeEncoding: true,
 			NumEntries:      2,
-			RangeEntries: []*RangeEntry{
+			RangeEntries: []*iabtcf.RangeEntry{
 				{
 					StartVendorID: 2,
 					EndVendorID:   2,
@@ -133,7 +134,7 @@ func TestEncode(t *testing.T) {
 				},
 			},
 		},
-		PublisherTC: &PublisherTC{
+		PublisherTC: &iabtcf.PublisherTC{
 			SegmentType: 3,
 			PubPurposesConsent: map[int]bool{
 				1: true,
@@ -157,7 +158,7 @@ func TestEncode(t *testing.T) {
 }
 func TestEncodeCoreString(t *testing.T) {
 	str := "COxSKBCOxSKCCBcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA"
-	segment := &CoreString{
+	segment := &iabtcf.CoreString{
 		Version:              2,
 		Created:              timeFromDeciSeconds(15859228738),
 		LastUpdated:          timeFromDeciSeconds(15859228802),
@@ -196,7 +197,7 @@ func TestEncodeCoreString(t *testing.T) {
 		IsRangeEncoding:     true,
 		VendorsConsent:      map[int]bool{},
 		NumEntries:          5,
-		RangeEntries: []*RangeEntry{
+		RangeEntries: []*iabtcf.RangeEntry{
 			{
 				StartVendorID: 25,
 				EndVendorID:   25,
@@ -222,7 +223,7 @@ func TestEncodeCoreString(t *testing.T) {
 		IsRangeEncodingLI:     true,
 		VendorsLITransparency: map[int]bool{},
 		NumEntriesLI:          3,
-		RangeEntriesLI: []*RangeEntry{
+		RangeEntriesLI: []*iabtcf.RangeEntry{
 			{
 				StartVendorID: 25,
 				EndVendorID:   25,
@@ -247,12 +248,12 @@ func TestEncodeCoreString(t *testing.T) {
 
 func TestEncodeDisclosedVendors(t *testing.T) {
 	str := "IDaQBQAMgAgABqAR0A2g"
-	segment := &DisclosedVendors{
+	segment := &iabtcf.DisclosedVendors{
 		SegmentType:     1,
 		MaxVendorId:     436,
 		IsRangeEncoding: true,
 		NumEntries:      5,
-		RangeEntries: []*RangeEntry{
+		RangeEntries: []*iabtcf.RangeEntry{
 			{
 				StartVendorID: 25,
 				EndVendorID:   25,
@@ -284,12 +285,12 @@ func TestEncodeDisclosedVendors(t *testing.T) {
 
 func TestEncodeAllowedVendors(t *testing.T) {
 	str := "QF3QAgABAA1A"
-	segment := &AllowedVendors{
+	segment := &iabtcf.AllowedVendors{
 		SegmentType:     2,
 		MaxVendorId:     750,
 		IsRangeEncoding: true,
 		NumEntries:      2,
-		RangeEntries: []*RangeEntry{
+		RangeEntries: []*iabtcf.RangeEntry{
 			{
 				StartVendorID: 2,
 				EndVendorID:   2,
@@ -309,7 +310,7 @@ func TestEncodeAllowedVendors(t *testing.T) {
 
 func TestEncodePublisherTC(t *testing.T) {
 	str := "eEAAAAAAAUA"
-	segment := &PublisherTC{
+	segment := &iabtcf.PublisherTC{
 		SegmentType: 3,
 		PubPurposesConsent: map[int]bool{
 			1: true,

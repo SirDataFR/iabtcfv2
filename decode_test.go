@@ -1,13 +1,14 @@
-package iabtcf
+package iabtcf_test
 
 import (
+	iabtcf "github.com/SirDataFR/iab-tcf-v2"
 	"testing"
 )
 
 func TestDecode(t *testing.T) {
 	str := "COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA.IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA.elAAAAAAAWA"
 
-	data, err := Decode(str)
+	data, err := iabtcf.Decode(str)
 	if err != nil {
 		t.Errorf("TC String should be decoded without error: %s", err)
 		return
@@ -27,7 +28,7 @@ func TestDecode(t *testing.T) {
 func TestDecodeInvalid(t *testing.T) {
 	str := "IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA.elAAAAAAAWA"
 
-	_, err := Decode(str)
+	_, err := iabtcf.Decode(str)
 	if err == nil {
 		t.Errorf("TC String should not be decoded: %s", err)
 		return
@@ -37,12 +38,12 @@ func TestDecodeInvalid(t *testing.T) {
 func TestDecodeCoreString(t *testing.T) {
 	str := "COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA"
 
-	if DecodeSegmentType(str) != 0 {
+	if iabtcf.DecodeSegmentType(str) != 0 {
 		t.Errorf("Segment type should be 0")
 		return
 	}
 
-	segment, err := DecodeCoreString(str)
+	segment, err := iabtcf.DecodeCoreString(str)
 	if err != nil {
 		t.Errorf("Segment should be decoded without error: %s", err)
 		return
@@ -62,12 +63,12 @@ func TestDecodeCoreString(t *testing.T) {
 func TestDecodeDisclosedVendors(t *testing.T) {
 	str := "IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA"
 
-	if DecodeSegmentType(str) != 1 {
+	if iabtcf.DecodeSegmentType(str) != 1 {
 		t.Errorf("Segment type should be 1")
 		return
 	}
 
-	segment, err := DecodeDisclosedVendors(str)
+	segment, err := iabtcf.DecodeDisclosedVendors(str)
 	if err != nil {
 		t.Errorf("Segment should be decoded without error: %s", err)
 		return
@@ -97,12 +98,12 @@ func TestDecodeDisclosedVendors(t *testing.T) {
 func TestDecodeAllowedVendors(t *testing.T) {
 	str := "QF3QAgABAA1A"
 
-	if DecodeSegmentType(str) != 2 {
+	if iabtcf.DecodeSegmentType(str) != 2 {
 		t.Errorf("Segment type should be 2")
 		return
 	}
 
-	segment, err := DecodeAllowedVendors(str)
+	segment, err := iabtcf.DecodeAllowedVendors(str)
 	if err != nil {
 		t.Errorf("Segment should be decoded without error: %s", err)
 		return
@@ -132,12 +133,12 @@ func TestDecodeAllowedVendors(t *testing.T) {
 func TestDecodePublisherTC(t *testing.T) {
 	str := "elAAAAAAAWA"
 
-	if DecodeSegmentType(str) != 3 {
+	if iabtcf.DecodeSegmentType(str) != 3 {
 		t.Errorf("Segment type should be 3")
 		return
 	}
 
-	segment, err := DecodePubllisherTC(str)
+	segment, err := iabtcf.DecodePubllisherTC(str)
 	if err != nil {
 		t.Errorf("Segment should be decoded without error: %s", err)
 		return
