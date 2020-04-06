@@ -64,7 +64,8 @@ func Decode(tcString string) (t *TCData, err error) {
 			return nil, err
 		}
 
-		if segmentType == SegmentTypeDisclosedVendors {
+		switch segmentType {
+		case SegmentTypeDisclosedVendors:
 			if mapSegments[SegmentTypeDisclosedVendors] == true {
 				return nil, fmt.Errorf("duplicate Disclosed Vendors segment")
 			}
@@ -73,7 +74,8 @@ func Decode(tcString string) (t *TCData, err error) {
 				t.DisclosedVendors = segment
 				mapSegments[SegmentTypeDisclosedVendors] = true
 			}
-		} else if segmentType == SegmentTypeAllowedVendors {
+			break
+		case SegmentTypeAllowedVendors:
 			if mapSegments[SegmentTypeAllowedVendors] == true {
 				return nil, fmt.Errorf("duplicate Allowed Vendors segment")
 			}
@@ -82,7 +84,8 @@ func Decode(tcString string) (t *TCData, err error) {
 				t.AllowedVendors = segment
 				mapSegments[SegmentTypeAllowedVendors] = true
 			}
-		} else if segmentType == SegmentTypePublisherTC {
+			break
+		case SegmentTypePublisherTC:
 			if mapSegments[SegmentTypePublisherTC] == true {
 				return nil, fmt.Errorf("duplicate Publisher TC segment")
 			}
@@ -91,7 +94,8 @@ func Decode(tcString string) (t *TCData, err error) {
 				t.PublisherTC = segment
 				mapSegments[SegmentTypePublisherTC] = true
 			}
-		} else {
+			break
+		default:
 			if mapSegments[SegmentTypeCoreString] == true {
 				return nil, fmt.Errorf("duplicate Core String segment")
 			}
@@ -102,6 +106,7 @@ func Decode(tcString string) (t *TCData, err error) {
 					mapSegments[SegmentTypeCoreString] = true
 				}
 			}
+			break
 		}
 	}
 
