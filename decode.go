@@ -6,58 +6,117 @@ import (
 	"strings"
 )
 
-func DecodeSegmentType(s string) int {
-	b, err := base64.RawURLEncoding.DecodeString(s)
-	if err != nil {
-		return 0
-	}
-
-	var e = newTCEncoder(b)
-	return e.readInt(3)
-}
-
-func Decode(s string) (t *TCData, err error) {
-	t = &TCData{}
-	for _, v := range strings.Split(s, ".") {
-		segmentType := DecodeSegmentType(v)
-		if segmentType == 1 {
-			segment, err := DecodeDisclosedVendors(v)
-			if err == nil {
-				t.DisclosedVendors = segment
-			}
-		} else if segmentType == 2 {
-			segment, err := DecodeAllowedVendors(v)
-			if err == nil {
-				t.AllowedVendors = segment
-			}
-		} else if segmentType == 3 {
-			segment, err := DecodePublisherTC(v)
-			if err == nil {
-				t.PublisherTC = segment
-			}
-		} else {
-			segment, err := DecodeCoreString(v)
-			if err == nil {
-				t.CoreString = segment
-			}
-		}
-	}
-
-	if t.CoreString == nil {
-		return nil, fmt.Errorf("invalid TC string")
-	}
-
-	return t, nil
-}
-
-func DecodeCoreString(s string) (c *CoreString, err error) {
+// Decodes a Core String value and returns the TCF version
+// It can also decode version from a TCF V1.1 consent string
+func GetVersion(coreString string) (version int, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	b, err := base64.RawURLEncoding.DecodeString(coreString)
+	if err != nil {
+		return 0, err
+	}
+
+	var e = newTCEncoder(b)
+	return e.readInt(6), nil
+}
+
+// Decodes a segment value and returns the type
+// - 0 = Core String
+// - 1 = Disclosed Vendors
+// - 2 = Allowed Vendors
+// - 3 = Publisher TC
+func GetSegmentType(segment string) (segmentType int, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", r)
+		}
+	}()
+
+	b, err := base64.RawURLEncoding.DecodeString(segment)
+	if err != nil {
+		return 0, err
+	}
+
+	var e = newTCEncoder(b)
+	return e.readInt(3), nil
+}
+
+// Decode a TC String and returns it as a TCData structure
+// A valid TC String must start with a Core String segment
+// A TC String can optionally and arbitrarily ordered contain:
+// - Disclosed Vendors
+// - Allowed Vendors
+// - Publisher TC
+func Decode(tcString string) (t *TCData, err error) {
+	t = &TCData{}
+	mapSegments := map[int]bool{}
+	for i, v := range strings.Split(tcString, ".") {
+		segmentType, err := GetSegmentType(v)
+		if err != nil {
+			return nil, err
+		}
+
+		if segmentType == disclosedVendorsType {
+			if mapSegments[disclosedVendorsType] == true {
+				return nil, fmt.Errorf("duplicate Disclosed Vendors segment")
+			}
+			segment, err := DecodeDisclosedVendors(v)
+			if err == nil {
+				t.DisclosedVendors = segment
+				mapSegments[disclosedVendorsType] = true
+			}
+		} else if segmentType == allowedVendorsType {
+			if mapSegments[allowedVendorsType] == true {
+				return nil, fmt.Errorf("duplicate Allowed Vendors segment")
+			}
+			segment, err := DecodeAllowedVendors(v)
+			if err == nil {
+				t.AllowedVendors = segment
+				mapSegments[allowedVendorsType] = true
+			}
+		} else if segmentType == publicherTCType {
+			if mapSegments[publicherTCType] == true {
+				return nil, fmt.Errorf("duplicate Publisher TC segment")
+			}
+			segment, err := DecodePublisherTC(v)
+			if err == nil {
+				t.PublisherTC = segment
+				mapSegments[publicherTCType] = true
+			}
+		} else {
+			if mapSegments[coreStringType] == true {
+				return nil, fmt.Errorf("duplicate Core String segment")
+			}
+			segment, err := DecodeCoreString(v)
+			if err == nil {
+				t.CoreString = segment
+				if i == 0 {
+					mapSegments[coreStringType] = true
+				}
+			}
+		}
+	}
+
+	if mapSegments[coreStringType] == false {
+		return nil, fmt.Errorf("invalid TC string")
+	}
+
+	return t, nil
+}
+
+// Decodes a Core String value and returns it as a CoreString structure
+func DecodeCoreString(coreString string) (c *CoreString, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", r)
+		}
+	}()
+
+	b, err := base64.RawURLEncoding.DecodeString(coreString)
 	if err != nil {
 		return nil, err
 	}
@@ -106,14 +165,15 @@ func DecodeCoreString(s string) (c *CoreString, err error) {
 	return c, nil
 }
 
-func DecodeDisclosedVendors(s string) (d *DisclosedVendors, err error) {
+// Decodes a Disclosed Vendors value and returns it as a DisclosedVendors structure
+func DecodeDisclosedVendors(disclosedVendors string) (d *DisclosedVendors, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	b, err := base64.RawURLEncoding.DecodeString(disclosedVendors)
 	if err != nil {
 		return nil, err
 	}
@@ -139,14 +199,15 @@ func DecodeDisclosedVendors(s string) (d *DisclosedVendors, err error) {
 	return d, nil
 }
 
-func DecodeAllowedVendors(s string) (a *AllowedVendors, err error) {
+// Decodes a Allowed Vendors value and returns it as a AllowedVendors structure
+func DecodeAllowedVendors(allowedVendors string) (a *AllowedVendors, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	b, err := base64.RawURLEncoding.DecodeString(allowedVendors)
 	if err != nil {
 		return nil, err
 	}
@@ -171,14 +232,15 @@ func DecodeAllowedVendors(s string) (a *AllowedVendors, err error) {
 	return a, nil
 }
 
-func DecodePublisherTC(s string) (p *PublisherTC, err error) {
+// Decodes a Publisher TC value and returns it as a PublisherTC structure
+func DecodePublisherTC(publisherTC string) (p *PublisherTC, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	b, err := base64.RawURLEncoding.DecodeString(publisherTC)
 	if err != nil {
 		return nil, err
 	}

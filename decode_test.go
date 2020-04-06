@@ -4,6 +4,57 @@ import (
 	"testing"
 )
 
+func TestGetVersion(t *testing.T) {
+	version, err := GetVersion("BOr70tQOxPQw-BcAsCFRDEqAAAAu1rxyZn7kfUXiXSZxNuiGGp6h-Wd9CWUcKZYpMAnyhYZRfg_AQhQ4Eu0LRNNycgh45MoCCMoRQaiSkCABGgFcTpjTmxAUxoRLawAMBrwhWLEQeroyHcJzAAHN_QjACAA")
+	if err != nil {
+		t.Errorf("Version should be decoded without error: %s", err)
+		return
+	}
+
+	if version != 1 {
+		t.Errorf("Version should be 1")
+	}
+
+	version, err = GetVersion("COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA")
+	if err != nil {
+		t.Errorf("Version should be decoded without error: %s", err)
+		return
+	}
+
+	if version != 2 {
+		t.Errorf("Version should be 2")
+	}
+}
+
+func TestGetSegmentType(t *testing.T) {
+	str := "IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70"
+
+	segType, err := GetSegmentType(str)
+	if err != nil {
+		t.Errorf("Segment type should be decoded without error: %s", err)
+		return
+	}
+
+	if segType != 1 {
+		t.Errorf("Segment type should be 1")
+	}
+}
+
+func TestGetVersionAndSegmentTypeFail(t *testing.T) {
+	str := "A"
+
+	_, err := GetVersion(str)
+	if err == nil {
+		t.Errorf("Version should not be decoded")
+		return
+	}
+
+	_, err = GetSegmentType(str)
+	if err == nil {
+		t.Errorf("Segment type should not be decoded")
+	}
+}
+
 func TestDecode(t *testing.T) {
 	str := "COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA.IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA.elAAAAAAAWA"
 
@@ -24,8 +75,28 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-func TestDecodeInvalid(t *testing.T) {
+func TestDecodeMissingCore(t *testing.T) {
 	str := "IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA.elAAAAAAAWA"
+
+	_, err := Decode(str)
+	if err == nil {
+		t.Errorf("TC String should not be decoded: %s", err)
+		return
+	}
+}
+
+func TestDecodeWrongOrdered(t *testing.T) {
+	str := "elAAAAAAAWA.COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA.IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA"
+
+	_, err := Decode(str)
+	if err == nil {
+		t.Errorf("TC String should not be decoded: %s", err)
+		return
+	}
+}
+
+func TestDecodeDuplicateSegment(t *testing.T) {
+	str := "COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA.COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA"
 
 	_, err := Decode(str)
 	if err == nil {
@@ -37,7 +108,13 @@ func TestDecodeInvalid(t *testing.T) {
 func TestDecodeCoreString(t *testing.T) {
 	str := "COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA"
 
-	if DecodeSegmentType(str) != 0 {
+	segType, err := GetSegmentType(str)
+	if err != nil {
+		t.Errorf("Segment type should be decoded without error: %s", err)
+		return
+	}
+
+	if segType != 0 {
 		t.Errorf("Segment type should be 0")
 		return
 	}
@@ -62,7 +139,13 @@ func TestDecodeCoreString(t *testing.T) {
 func TestDecodeDisclosedVendors(t *testing.T) {
 	str := "IF3EXySoGY2tho2YVFzBEIYwfJxyigMgShgQIsS0NQIeFLBoGPiAAHBGYJAQAGBAkkACBAQIsHGBMCQABgAgRiRCMQEGMDzNIBIBAggkbY0FACCVmnkHS3ZCY70-6u__QA"
 
-	if DecodeSegmentType(str) != 1 {
+	segType, err := GetSegmentType(str)
+	if err != nil {
+		t.Errorf("Segment type should be decoded without error: %s", err)
+		return
+	}
+
+	if segType != 1 {
 		t.Errorf("Segment type should be 1")
 		return
 	}
@@ -97,7 +180,13 @@ func TestDecodeDisclosedVendors(t *testing.T) {
 func TestDecodeAllowedVendors(t *testing.T) {
 	str := "QF3QAgABAA1A"
 
-	if DecodeSegmentType(str) != 2 {
+	segType, err := GetSegmentType(str)
+	if err != nil {
+		t.Errorf("Segment type should be decoded without error: %s", err)
+		return
+	}
+
+	if segType != 2 {
 		t.Errorf("Segment type should be 2")
 		return
 	}
@@ -132,7 +221,13 @@ func TestDecodeAllowedVendors(t *testing.T) {
 func TestDecodePublisherTC(t *testing.T) {
 	str := "elAAAAAAAWA"
 
-	if DecodeSegmentType(str) != 3 {
+	segType, err := GetSegmentType(str)
+	if err != nil {
+		t.Errorf("Segment type should be decoded without error: %s", err)
+		return
+	}
+
+	if segType != 3 {
 		t.Errorf("Segment type should be 3")
 		return
 	}

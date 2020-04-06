@@ -2,6 +2,13 @@ package iabtcfv2
 
 import "strings"
 
+const (
+	coreStringType       = 0
+	disclosedVendorsType = 1
+	allowedVendorsType   = 2
+	publicherTCType      = 3
+)
+
 type TCData struct {
 	CoreString       *CoreString
 	DisclosedVendors *DisclosedVendors
