@@ -36,15 +36,19 @@ if err != nil {
 }
 ```
 
-Use `GetSegmentType(segment string)` to read the segment type from a segment value:
-- `0` = *Core String*
-- `1` = *Disclosed Vendors*
-- `2` = *Allowed Vendors*
-- `3` = *Publisher TC*
+Use `GetSegmentType(segment string) (segmentType SegmentType, err error)` to read the segment type from a segment value:
+- `SegmentTypeUndefined` = undefined
+- `SegmentTypeCoreString` = *Core String*
+- `SegmentTypeDisclosedVendors` = *Disclosed Vendors*
+- `SegmentTypeAllowedVendors` = *Allowed Vendors*
+- `SegmentTypePublisherTC` = *Publisher TC*
 
-Use `GetVersion(s string)` to verify the cookie version from a TC String or a *Core String* segment value. This function also supports TCF V1.1 consent strings:
-- `1` = TCF V1.1
-- `2` = TCF V2.0
+You can find more information about segment types [here](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md#disclosed-vendors-oob).
+
+Use `GetVersion(s string) (version TcfVersion, err error)` to read the cookie version from a TC String or a *Core String* segment value. This function also supports TCF V1.1 consent strings:
+- `TcfVersionUndefined` = undefined
+- `TcfVersion1` = TCF V1.1
+- `TcfVersion2` = TCF V2.0
 
 #### Example
 ```

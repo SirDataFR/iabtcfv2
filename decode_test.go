@@ -11,8 +11,8 @@ func TestGetVersion(t *testing.T) {
 		return
 	}
 
-	if version != 1 {
-		t.Errorf("Version should be 1")
+	if version != TcfVersion1 {
+		t.Errorf("Version should be %d", TcfVersion1)
 	}
 
 	version, err = GetVersion("COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA")
@@ -21,8 +21,8 @@ func TestGetVersion(t *testing.T) {
 		return
 	}
 
-	if version != 2 {
-		t.Errorf("Version should be 2")
+	if version != TcfVersion2 {
+		t.Errorf("Version should be %d", TcfVersion2)
 	}
 }
 
@@ -35,8 +35,8 @@ func TestGetSegmentType(t *testing.T) {
 		return
 	}
 
-	if segType != 1 {
-		t.Errorf("Segment type should be 1")
+	if segType != SegmentTypeDisclosedVendors {
+		t.Errorf("Segment type should be %d", SegmentTypeDisclosedVendors)
 	}
 }
 
@@ -114,8 +114,8 @@ func TestDecodeCoreString(t *testing.T) {
 		return
 	}
 
-	if segType != 0 {
-		t.Errorf("Segment type should be 0")
+	if segType != SegmentTypeCoreString {
+		t.Errorf("Segment type should be %d", SegmentTypeCoreString)
 		return
 	}
 
@@ -145,8 +145,8 @@ func TestDecodeDisclosedVendors(t *testing.T) {
 		return
 	}
 
-	if segType != 1 {
-		t.Errorf("Segment type should be 1")
+	if segType != SegmentTypeDisclosedVendors {
+		t.Errorf("Segment type should be %d", SegmentTypeDisclosedVendors)
 		return
 	}
 
@@ -186,8 +186,8 @@ func TestDecodeAllowedVendors(t *testing.T) {
 		return
 	}
 
-	if segType != 2 {
-		t.Errorf("Segment type should be 2")
+	if segType != SegmentTypeAllowedVendors {
+		t.Errorf("Segment type should be %d", SegmentTypeAllowedVendors)
 		return
 	}
 
@@ -227,8 +227,8 @@ func TestDecodePublisherTC(t *testing.T) {
 		return
 	}
 
-	if segType != 3 {
-		t.Errorf("Segment type should be 3")
+	if segType != SegmentTypePublisherTC {
+		t.Errorf("Segment type should be %d", SegmentTypePublisherTC)
 		return
 	}
 

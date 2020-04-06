@@ -6,9 +6,12 @@ import (
 	"strings"
 )
 
-// Decodes a string and returns the TCF version
+// Decodes a string and returns the TcfVersion
 // It can also decode version from a TCF V1.1 consent string
-func GetVersion(s string) (version int, err error) {
+// - TcfVersionUndefined = -1
+// - TcfVersion1 = 1
+// - TcfVersion2 = 2
+func GetVersion(s string) (version TcfVersion, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
@@ -17,19 +20,20 @@ func GetVersion(s string) (version int, err error) {
 
 	b, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
-		return 0, err
+		return TcfVersionUndefined, err
 	}
 
 	var e = newTCEncoder(b)
-	return e.readInt(6), nil
+	return TcfVersion(e.readInt(6)), nil
 }
 
-// Decodes a segment value and returns the type
-// - 0 = Core String
-// - 1 = Disclosed Vendors
-// - 2 = Allowed Vendors
-// - 3 = Publisher TC
-func GetSegmentType(segment string) (segmentType int, err error) {
+// Decodes a segment value and returns the SegmentType
+// - SegmentTypeUndefined = -1
+// - SegmentTypeCoreString = 0
+// - SegmentTypeDisclosedVendors = 1
+// - SegmentTypeAllowedVendors = 2
+// - SegmentTypePublisherTC = 3
+func GetSegmentType(segment string) (segmentType SegmentType, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
@@ -38,11 +42,11 @@ func GetSegmentType(segment string) (segmentType int, err error) {
 
 	b, err := base64.RawURLEncoding.DecodeString(segment)
 	if err != nil {
-		return 0, err
+		return SegmentTypeUndefined, err
 	}
 
 	var e = newTCEncoder(b)
-	return e.readInt(3), nil
+	return SegmentType(e.readInt(3)), nil
 }
 
 // Decode a TC String and returns it as a TCData structure
@@ -53,55 +57,55 @@ func GetSegmentType(segment string) (segmentType int, err error) {
 // - Publisher TC
 func Decode(tcString string) (t *TCData, err error) {
 	t = &TCData{}
-	mapSegments := map[int]bool{}
+	mapSegments := map[SegmentType]bool{}
 	for i, v := range strings.Split(tcString, ".") {
 		segmentType, err := GetSegmentType(v)
 		if err != nil {
 			return nil, err
 		}
 
-		if segmentType == disclosedVendorsType {
-			if mapSegments[disclosedVendorsType] == true {
+		if segmentType == SegmentTypeDisclosedVendors {
+			if mapSegments[SegmentTypeDisclosedVendors] == true {
 				return nil, fmt.Errorf("duplicate Disclosed Vendors segment")
 			}
 			segment, err := DecodeDisclosedVendors(v)
 			if err == nil {
 				t.DisclosedVendors = segment
-				mapSegments[disclosedVendorsType] = true
+				mapSegments[SegmentTypeDisclosedVendors] = true
 			}
-		} else if segmentType == allowedVendorsType {
-			if mapSegments[allowedVendorsType] == true {
+		} else if segmentType == SegmentTypeAllowedVendors {
+			if mapSegments[SegmentTypeAllowedVendors] == true {
 				return nil, fmt.Errorf("duplicate Allowed Vendors segment")
 			}
 			segment, err := DecodeAllowedVendors(v)
 			if err == nil {
 				t.AllowedVendors = segment
-				mapSegments[allowedVendorsType] = true
+				mapSegments[SegmentTypeAllowedVendors] = true
 			}
-		} else if segmentType == publicherTCType {
-			if mapSegments[publicherTCType] == true {
+		} else if segmentType == SegmentTypePublisherTC {
+			if mapSegments[SegmentTypePublisherTC] == true {
 				return nil, fmt.Errorf("duplicate Publisher TC segment")
 			}
 			segment, err := DecodePublisherTC(v)
 			if err == nil {
 				t.PublisherTC = segment
-				mapSegments[publicherTCType] = true
+				mapSegments[SegmentTypePublisherTC] = true
 			}
 		} else {
-			if mapSegments[coreStringType] == true {
+			if mapSegments[SegmentTypeCoreString] == true {
 				return nil, fmt.Errorf("duplicate Core String segment")
 			}
 			segment, err := DecodeCoreString(v)
 			if err == nil {
 				t.CoreString = segment
 				if i == 0 {
-					mapSegments[coreStringType] = true
+					mapSegments[SegmentTypeCoreString] = true
 				}
 			}
 		}
 	}
 
-	if mapSegments[coreStringType] == false {
+	if mapSegments[SegmentTypeCoreString] == false {
 		return nil, fmt.Errorf("invalid TC string")
 	}
 
