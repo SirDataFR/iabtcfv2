@@ -1,6 +1,6 @@
 # iab-tcf-v2
 Go client library to read and encode IAB TCF V2.0 TC Strings.
-####Installation
+### Installation
 
 ```
 go get github.com/SirDataFR/iabtcfv2
@@ -12,7 +12,7 @@ The package defines a `TCData` structure with the four segments a TC String can 
 - `AllowedVendors`
 - `PublisherTC`
 
-#### Decode a TC String
+### Decode a TC String
 
 To decode a TC String, use the `Decode(tcString string)` function.
 
@@ -46,7 +46,7 @@ Use `GetVersion(s string)` to verify the cookie version from a TC String or a *C
 - `1` = TCF V1.1
 - `2` = TCF V2.0
 
-#####Example
+#### Example
 ```
 package main
 
@@ -82,13 +82,13 @@ func main() {
 }
 ```
 
-#### Encode a TC String
+### Encode a TC String
 
 To encode a TC String, use the `ToTCString()` function on the `TCData` structure.
 
 To encode a single segment of a TC String, use the `Encode()` function on the appropriate segment.
 
-#####Example
+#### Example
 ```
 package main
 
@@ -125,11 +125,11 @@ func main() {
 }
 ```
 
-#### Read TC Data
+### Read TC Data
 
 To verify that a legal basis is established for a purpose or a vendor, use the functions on each structure.
 
-##### CoreString
+#### CoreString
 | Function                 | Parameter        | Description           |
 | ------------------------ | :--------------: | --------------------- |
 | IsSpecialFeatureAllowed  | int | Returns `true` if user has given consent to special feature id |
@@ -140,17 +140,17 @@ To verify that a legal basis is established for a purpose or a vendor, use the f
 
 NOTE: For convenience the `CoreString` functions are also available from the `TCData` structure.
 
-##### DisclosedVendors
+#### DisclosedVendors
 | Function                 | Parameter        | Description           |
 | ------------------------ | :--------------: | --------------------- |
 | IsVendorDisclosed        | int | Returns `true` if vendor id is disclosed for validating OOB signaling |
 
-##### AllowedVendors
+#### AllowedVendors
 | Function                 | Parameter        | Description           |
 | ------------------------ | :--------------: | --------------------- |
 | IsVendorAllowed          | int | Returns `true` if vendor id is allowed for OOB signaling |
 
-##### PublisherTC
+#### PublisherTC
 | Function                 | Parameter        | Description           |
 | ------------------------ | :--------------: | --------------------- |
 | IsPurposeAllowed         | int | Returns `true` if user has given consent to standard purpose id |
@@ -158,7 +158,7 @@ NOTE: For convenience the `CoreString` functions are also available from the `TC
 | IsCustomPurposeAllowed   | int | Returns `true` if user has given consent to custom purpose id |
 | IsCustomPurposeLIAllowed | int | Returns `true` if legitimate interest is established for custom purpose id and user didn't exercise their right to object |
 
-#####Example
+####Example
 ```
 package main
 
