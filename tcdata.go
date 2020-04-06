@@ -16,6 +16,11 @@ type TCData struct {
 	PublisherTC      *PublisherTC
 }
 
+// Returns true if user has given consent to special feature id
+func (t *TCData) IsSpecialFeatureAllowed(id int) bool {
+	return t.CoreString.IsSpecialFeatureAllowed(id)
+}
+
 // Returns true if user has given consent to purpose id
 func (t *TCData) IsPurposeAllowed(id int) bool {
 	return t.CoreString.IsPurposeAllowed(id)
