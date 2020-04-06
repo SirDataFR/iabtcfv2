@@ -14,7 +14,7 @@ The package defines a `TCData` structure with the four segments a TC String can 
 
 ### Decode a TC String
 
-To decode a TC String, use the `Decode(tcString string)` function.
+To decode a TC String, use `Decode(tcString string) (t *TCData, err error)`.
 
 NOTE : A valid TC String must start with a *Core String* segment value.
 ```
@@ -25,10 +25,10 @@ if err != nil {
 ```
 
 To decode a segment value of a TC String, use the appropriate function:
-- `DecodeCoreString(coreString string)`
-- `DecodeDisclosedVendors(disclosedVendors string)`
-- `DecodeAllowedVendors(allowedVendors string)`
-- `DecodePublisherTC(publisherTC string)`
+- `DecodeCoreString(coreString string) (c *CoreString, err error)`
+- `DecodeDisclosedVendors(disclosedVendors string) (d *DisclosedVendors, err error)`
+- `DecodeAllowedVendors(allowedVendors string) (a *AllowedVendors, err error)`
+- `DecodePublisherTC(publisherTC string) (p *PublisherTC, err error)`
 ```
 var coreString, err = iabtcfv2.DecodeCoreString("COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA")
 if err != nil {
@@ -88,9 +88,9 @@ func main() {
 
 ### Encode a TC String
 
-To encode a TC String, use the `ToTCString()` function on the `TCData` structure.
+To encode a TC String, use `ToTCString() string` on the `TCData` structure.
 
-To encode a single segment of a TC String, use the `Encode()` function on the appropriate segment.
+To encode a single segment of a TC String, use `Encode() string` on the appropriate segment.
 
 #### Example
 ```
