@@ -6,16 +6,16 @@ import (
 	"strings"
 )
 
-// Decodes a Core String value and returns the TCF version
+// Decodes a string and returns the TCF version
 // It can also decode version from a TCF V1.1 consent string
-func GetVersion(coreString string) (version int, err error) {
+func GetVersion(s string) (version int, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(coreString)
+	b, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
 		return 0, err
 	}
