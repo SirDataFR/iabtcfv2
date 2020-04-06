@@ -158,7 +158,7 @@ NOTE: For convenience the `CoreString` functions are also available from the `TC
 | IsCustomPurposeAllowed   | int | Returns `true` if user has given consent to custom purpose id |
 | IsCustomPurposeLIAllowed | int | Returns `true` if legitimate interest is established for custom purpose id and user didn't exercise their right to object |
 
-####Example
+#### Example
 ```
 package main
 
