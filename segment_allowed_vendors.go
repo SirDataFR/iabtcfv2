@@ -13,6 +13,7 @@ type AllowedVendors struct {
 	RangeEntries    []*RangeEntry
 }
 
+// Returns true if vendor id is allowed for OOB signaling
 func (a *AllowedVendors) IsVendorAllowed(id int) bool {
 	if a.IsRangeEncoding {
 		for _, entry := range a.RangeEntries {
@@ -26,6 +27,7 @@ func (a *AllowedVendors) IsVendorAllowed(id int) bool {
 	return a.AllowedVendors[id]
 }
 
+// Returns structure as a base64 raw url encoded string
 func (a *AllowedVendors) Encode() string {
 	bitSize := 20
 

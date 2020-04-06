@@ -48,18 +48,23 @@ type RangeEntry struct {
 	EndVendorID   int
 }
 
+// Returns true if user has given consent to special feature id
 func (c *CoreString) IsSpecialFeatureAllowed(id int) bool {
 	return c.SpecialFeatureOptIns[id]
 }
 
+// Returns true if user has given consent to purpose id
 func (c *CoreString) IsPurposeAllowed(id int) bool {
 	return c.PurposesConsent[id]
 }
 
+// Returns true if legitimate interest is established for purpose id
+// and user didn't exercise their right to object
 func (c *CoreString) IsPurposeLIAllowed(id int) bool {
 	return c.PurposesLITransparency[id]
 }
 
+// Returns true if user has given consent to vendor id processing their personal data
 func (c *CoreString) IsVendorAllowed(id int) bool {
 	if c.IsRangeEncoding {
 		for _, entry := range c.RangeEntries {
@@ -73,6 +78,8 @@ func (c *CoreString) IsVendorAllowed(id int) bool {
 	return c.VendorsConsent[id]
 }
 
+// Returns true if transparency for vendor id's legitimate interest is established
+// and user didn't exercise their right to object
 func (c *CoreString) IsVendorLIAllowed(id int) bool {
 	if c.IsRangeEncodingLI {
 		for _, entry := range c.RangeEntriesLI {
@@ -86,6 +93,7 @@ func (c *CoreString) IsVendorLIAllowed(id int) bool {
 	return c.VendorsLITransparency[id]
 }
 
+// Returns structure as a base64 raw url encoded string
 func (c *CoreString) Encode() string {
 	bitSize := 230
 

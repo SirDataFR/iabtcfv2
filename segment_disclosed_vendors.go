@@ -13,6 +13,7 @@ type DisclosedVendors struct {
 	RangeEntries     []*RangeEntry
 }
 
+// Returns true if vendor id is disclosed for validating OOB signaling
 func (d *DisclosedVendors) IsVendorDisclosed(id int) bool {
 	if d.IsRangeEncoding {
 		for _, entry := range d.RangeEntries {
@@ -26,6 +27,7 @@ func (d *DisclosedVendors) IsVendorDisclosed(id int) bool {
 	return d.DisclosedVendors[id]
 }
 
+// Returns structure as a base64 raw url encoded string
 func (d *DisclosedVendors) Encode() string {
 	bitSize := 20
 
