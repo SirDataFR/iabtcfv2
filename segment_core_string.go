@@ -38,7 +38,7 @@ type CoreString struct {
 
 type PubRestriction struct {
 	PurposeId       int
-	RestrictionType int
+	RestrictionType RestrictionType
 	NumEntries      int
 	RangeEntries    []*RangeEntry
 }
