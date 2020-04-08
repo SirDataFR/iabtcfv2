@@ -93,6 +93,77 @@ func (c *CoreString) IsVendorLIAllowed(id int) bool {
 	return c.VendorsLITransparency[id]
 }
 
+// Returns true if user has given consent to vendor id processing all purposes ids
+// and publisher hasn't set restrictions for them
+func (c *CoreString) IsVendorAllowedForPurposes(id int, purposeIds ...int) bool {
+	if !c.IsVendorAllowed(id) {
+		return false
+	}
+
+	for _, p := range purposeIds {
+		if !c.IsPurposeAllowed(p) {
+			return false
+		}
+	}
+
+	for _, p := range purposeIds {
+		pr := c.GetPubRestrictionsForPurpose(p)
+		for _, r := range pr {
+			if (r.RestrictionType == RestrictionTypeNotAllowed || r.RestrictionType == RestrictionTypeRequireLI) && r.IsVendorIncluded(id) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
+// and publisher hasn't set restrictions for them
+func (c *CoreString) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) bool {
+	if !c.IsVendorLIAllowed(id) {
+		return false
+	}
+
+	for _, p := range purposeIds {
+		if !c.IsPurposeLIAllowed(p) {
+			return false
+		}
+	}
+
+	for _, p := range purposeIds {
+		pr := c.GetPubRestrictionsForPurpose(p)
+		for _, r := range pr {
+			if (r.RestrictionType == RestrictionTypeNotAllowed || r.RestrictionType == RestrictionTypeRequireConsent) && r.IsVendorIncluded(id) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// Returns a list of publisher restrictions applied to purpose id
+func (c *CoreString) GetPubRestrictionsForPurpose(id int) []*PubRestriction {
+	var pr []*PubRestriction
+	for _, r := range c.PubRestrictions {
+		if r.PurposeId == id {
+			pr = append(pr, r)
+		}
+	}
+	return pr
+}
+
+// Returns true if restriction is applied to vendor id
+func (p *PubRestriction) IsVendorIncluded(id int) bool {
+	for _, entry := range p.RangeEntries {
+		if entry.StartVendorID <= id && id <= entry.EndVendorID {
+			return true
+		}
+	}
+	return false
+}
+
 // Returns structure as a base64 raw url encoded string
 func (c *CoreString) Encode() string {
 	bitSize := 230

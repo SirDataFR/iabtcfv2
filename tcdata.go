@@ -36,6 +36,23 @@ func (t *TCData) IsVendorLIAllowed(id int) bool {
 	return t.CoreString.IsVendorLIAllowed(id)
 }
 
+// Returns true if user has given consent to vendor id processing all purposes ids
+// and publisher hasn't set restrictions for them
+func (t *TCData) IsVendorAllowedForPurposes(id int, purposeIds ...int) bool {
+	return t.CoreString.IsVendorAllowedForPurposes(id, purposeIds...)
+}
+
+// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
+// and publisher hasn't set restrictions for them
+func (t *TCData) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) bool {
+	return t.CoreString.IsVendorAllowedForPurposesLI(id, purposeIds...)
+}
+
+// Returns a list of publisher restrictions applied to purpose id
+func (t *TCData) GetPubRestrictionsForPurpose(id int) []*PubRestriction {
+	return t.CoreString.GetPubRestrictionsForPurpose(id)
+}
+
 // Returns structure as a base64 raw url encoded string
 func (t *TCData) ToTCString() string {
 	var segments []string
