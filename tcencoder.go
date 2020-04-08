@@ -82,7 +82,7 @@ func (r *TCEncoder) readRangeEntries(n uint) []*RangeEntry {
 func (r *TCEncoder) writePubRestrictions(entries []*PubRestriction) {
 	for _, entry := range entries {
 		r.writeInt(entry.PurposeId, 6)
-		r.writeInt(entry.RestrictionType, 2)
+		r.writeInt(int(entry.RestrictionType), 2)
 		r.writeInt(len(entry.RangeEntries), 12)
 		r.writeRangeEntries(entry.RangeEntries)
 	}
@@ -96,7 +96,7 @@ func (r *TCEncoder) readPubRestrictions(n uint) []*PubRestriction {
 		var numEntries = r.readInt(12)
 		var rangeEntries = r.readRangeEntries(uint(numEntries))
 		ret = append(ret, &PubRestriction{PurposeId: purposeId,
-			RestrictionType: restrictionType,
+			RestrictionType: RestrictionType(restrictionType),
 			NumEntries:      numEntries,
 			RangeEntries:    rangeEntries,
 		})

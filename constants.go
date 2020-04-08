@@ -17,3 +17,12 @@ const (
 	TcfVersion1         TcfVersion = 1
 	TcfVersion2         TcfVersion = 2
 )
+
+type RestrictionType int
+
+const (
+	RestrictionTypeNotAllowed     RestrictionType = 0
+	RestrictionTypeRequireConsent RestrictionType = 1
+	RestrictionTypeRequireLI      RestrictionType = 2
+	RestrictionTypeUndefined      RestrictionType = 3
+)
