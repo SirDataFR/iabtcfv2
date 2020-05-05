@@ -203,6 +203,7 @@ func (c *CoreString) Encode() string {
 	for _, res := range c.PubRestrictions {
 		entriesSize := 20
 		for _, entry := range res.RangeEntries {
+			entriesSize += 1
 			if entry.EndVendorID > entry.StartVendorID {
 				entriesSize += 16 * 2
 			} else {
