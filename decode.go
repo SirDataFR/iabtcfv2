@@ -18,7 +18,12 @@ func GetVersion(s string) (version TcfVersion, err error) {
 		}
 	}()
 
-	b, err := base64.RawURLEncoding.DecodeString(s)
+	segments := strings.Split(s, ".")
+	if len(segments) == 0 {
+		return TcfVersionUndefined, err
+	}
+
+	b, err := base64.RawURLEncoding.DecodeString(segments[0])
 	if err != nil {
 		return TcfVersionUndefined, err
 	}
