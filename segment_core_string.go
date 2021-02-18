@@ -180,6 +180,13 @@ func (c *CoreString) Encode() string {
 		}
 		bitSize += +entriesSize
 	} else {
+		if c.MaxVendorId == 0 {
+			for id, _ := range c.VendorsConsent {
+				if id > c.MaxVendorId {
+					c.MaxVendorId = id
+				}
+			}
+		}
 		bitSize += c.MaxVendorId
 	}
 
@@ -196,6 +203,13 @@ func (c *CoreString) Encode() string {
 		}
 		bitSize += entriesSize
 	} else {
+		if c.MaxVendorIdLI == 0 {
+			for id, _ := range c.VendorsLITransparency {
+				if id > c.MaxVendorIdLI {
+					c.MaxVendorIdLI = id
+				}
+			}
+		}
 		bitSize += c.MaxVendorIdLI
 	}
 
@@ -203,7 +217,7 @@ func (c *CoreString) Encode() string {
 	for _, res := range c.PubRestrictions {
 		entriesSize := 20
 		for _, entry := range res.RangeEntries {
-			entriesSize += 1
+			entriesSize++
 			if entry.EndVendorID > entry.StartVendorID {
 				entriesSize += 16 * 2
 			} else {

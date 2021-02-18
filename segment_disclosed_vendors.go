@@ -43,6 +43,13 @@ func (d *DisclosedVendors) Encode() string {
 		}
 		bitSize += entriesSize
 	} else {
+		if d.MaxVendorId == 0 {
+			for id, _ := range d.DisclosedVendors {
+				if id > d.MaxVendorId {
+					d.MaxVendorId = id
+				}
+			}
+		}
 		bitSize += d.MaxVendorId
 	}
 
