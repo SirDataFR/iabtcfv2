@@ -143,6 +143,68 @@ func (c *CoreString) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) boo
 	return true
 }
 
+// Returns true if user has given consent to vendor id processing all purposes ids
+// or if transparency for its legitimate interest is established in accordance with publisher restrictions
+func (c *CoreString) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...int) bool {
+	for _, p := range purposeIds {
+		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
+			return false
+		}
+
+		pr := c.GetPubRestrictionsForPurpose(p)
+		for _, r := range pr {
+			if r.IsVendorIncluded(id) {
+				if r.RestrictionType == RestrictionTypeNotAllowed {
+					return false
+				} else if r.RestrictionType == RestrictionTypeRequireLI && !c.IsVendorLIAllowed(id) && !c.IsPurposeLIAllowed(p) {
+					return false
+				}
+			}
+		}
+
+		if !c.IsPurposeAllowed(p) {
+			return false
+		}
+	}
+
+	if !c.IsVendorAllowed(id) {
+		return false
+	}
+
+	return true
+}
+
+// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
+// or if user has given consent in accordance with publisher restrictions
+func (c *CoreString) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
+	for _, p := range purposeIds {
+		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
+			return false
+		}
+
+		pr := c.GetPubRestrictionsForPurpose(p)
+		for _, r := range pr {
+			if r.IsVendorIncluded(id) {
+				if r.RestrictionType == RestrictionTypeNotAllowed {
+					return false
+				} else if r.RestrictionType == RestrictionTypeRequireConsent && !c.IsVendorAllowed(id) && !c.IsPurposeAllowed(p) {
+					return false
+				}
+			}
+		}
+
+		if !c.IsPurposeLIAllowed(p) {
+			return false
+		}
+	}
+
+	if !c.IsVendorLIAllowed(id) {
+		return false
+	}
+
+	return true
+}
+
 // Returns a list of publisher restrictions applied to purpose id
 func (c *CoreString) GetPubRestrictionsForPurpose(id int) []*PubRestriction {
 	var pr []*PubRestriction

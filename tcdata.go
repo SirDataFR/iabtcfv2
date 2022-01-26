@@ -48,6 +48,18 @@ func (t *TCData) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) bool {
 	return t.CoreString.IsVendorAllowedForPurposesLI(id, purposeIds...)
 }
 
+// Returns true if user has given consent to vendor id processing all purposes ids
+// or if transparency for its legitimate interest is established in accordance with publisher restrictions
+func (t *TCData) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...int) bool {
+	return t.CoreString.IsVendorAllowedForFlexiblePurposes(id, purposeIds...)
+}
+
+// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
+// or if user has given consent in accordance with publisher restrictions
+func (t *TCData) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
+	return t.CoreString.IsVendorAllowedForFlexiblePurposesLI(id, purposeIds...)
+}
+
 // Returns a list of publisher restrictions applied to purpose id
 func (t *TCData) GetPubRestrictionsForPurpose(id int) []*PubRestriction {
 	return t.CoreString.GetPubRestrictionsForPurpose(id)
