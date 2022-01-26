@@ -143,6 +143,8 @@ To verify that a legal basis is established for a purpose or a vendor, use the f
 | IsVendorLIAllowed        | int | Returns `true` if transparency for vendor id's legitimate interest is established and user didn't exercise their right to object |
 | IsVendorAllowedForPurposes | (int, ...int) | Returns `true` if user has given consent to vendor id processing all purposes ids and publisher hasn't set restrictions for them |
 | IsVendorAllowedForPurposesLI | (int, ...int) | Returns `true` if transparency for vendor id's legitimate interest is established for all purpose ids and publisher hasn't set restrictions for them |
+| IsVendorAllowedForFlexiblePurposes | (int, ...int) | Returns `true` if user has given consent to vendor id processing all purposes ids or if transparency for its legitimate interest is established in accordance with publisher restrictions |
+| IsVendorAllowedForFlexiblePurposesLI | (int, ...int) | Returns `true` if transparency for vendor id's legitimate interest is established for all purpose ids or if user has given consent in accordance with publisher restrictions |
 | GetPubRestrictionsForPurpose | int | Returns a list of publisher restrictions applied to purpose id |
 
 NOTE: For convenience the `CoreString` functions are also available from the `TCData` structure.
