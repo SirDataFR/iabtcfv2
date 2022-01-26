@@ -6,12 +6,12 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	str := "COxSKBCOxSKCCBcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA.IDaQBQAMgAgABqAR0A2g.QF3QAgABAA1A.eEAAAAAAAUA"
+	str := "CPTZZYAPTZZYABcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA.IDaQBQAMgAgABqAR0A2g.QF3QAgABAA1A.eEAAAAAAAUA"
 	data := &TCData{
 		CoreString: &CoreString{
 			Version:              2,
-			Created:              timeFromDeciSeconds(15859228738),
-			LastUpdated:          timeFromDeciSeconds(15859228802),
+			Created:              timeFromDeciSeconds(16431552000),
+			LastUpdated:          timeFromDeciSeconds(16431552000),
 			CmpId:                92,
 			CmpVersion:           1,
 			ConsentScreen:        2,
@@ -156,11 +156,11 @@ func TestEncode(t *testing.T) {
 
 }
 func TestEncodeCoreString(t *testing.T) {
-	str := "COxSKBCOxSKCCBcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA"
+	str := "CPTZZYAPTZZYABcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA"
 	segment := &CoreString{
 		Version:              2,
-		Created:              timeFromDeciSeconds(15859228738),
-		LastUpdated:          timeFromDeciSeconds(15859228802),
+		Created:              timeFromDeciSeconds(16431552000),
+		LastUpdated:          timeFromDeciSeconds(16431552000),
 		CmpId:                92,
 		CmpVersion:           1,
 		ConsentScreen:        2,
