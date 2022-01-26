@@ -161,12 +161,18 @@ func (c *CoreString) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...in
 		}
 
 		for _, r := range pr {
-			if r.IsVendorIncluded(id) {
-				if r.RestrictionType == RestrictionTypeNotAllowed {
+			if !r.IsVendorIncluded(id) {
+				continue
+			}
+			switch r.RestrictionType {
+			case RestrictionTypeNotAllowed:
+				return false
+			case RestrictionTypeRequireConsent:
+				if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
 					return false
-				} else if r.RestrictionType == RestrictionTypeRequireLI && (!c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p)) {
-					return false
-				} else if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
+				}
+			case RestrictionTypeRequireLI:
+				if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
 					return false
 				}
 			}
@@ -194,12 +200,18 @@ func (c *CoreString) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...
 		}
 
 		for _, r := range pr {
-			if r.IsVendorIncluded(id) {
-				if r.RestrictionType == RestrictionTypeNotAllowed {
+			if !r.IsVendorIncluded(id) {
+				continue
+			}
+			switch r.RestrictionType {
+			case RestrictionTypeNotAllowed:
+				return false
+			case RestrictionTypeRequireConsent:
+				if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
 					return false
-				} else if r.RestrictionType == RestrictionTypeRequireConsent && (!c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p)) {
-					return false
-				} else if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
+				}
+			case RestrictionTypeRequireLI:
+				if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
 					return false
 				}
 			}
