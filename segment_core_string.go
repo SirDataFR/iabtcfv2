@@ -146,29 +146,31 @@ func (c *CoreString) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) boo
 // Returns true if user has given consent to vendor id processing all purposes ids
 // or if transparency for its legitimate interest is established in accordance with publisher restrictions
 func (c *CoreString) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...int) bool {
+	if !c.IsVendorAllowed(id) && !c.IsVendorLIAllowed(id) {
+		return false
+	}
+
 	for _, p := range purposeIds {
 		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
 			return false
 		}
 
 		pr := c.GetPubRestrictionsForPurpose(p)
+		if len(pr) == 0 && (!c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p)) {
+			return false
+		}
+
 		for _, r := range pr {
 			if r.IsVendorIncluded(id) {
 				if r.RestrictionType == RestrictionTypeNotAllowed {
 					return false
-				} else if r.RestrictionType == RestrictionTypeRequireLI && !c.IsVendorLIAllowed(id) && !c.IsPurposeLIAllowed(p) {
+				} else if r.RestrictionType == RestrictionTypeRequireLI && (!c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p)) {
+					return false
+				} else if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
 					return false
 				}
 			}
 		}
-
-		if !c.IsPurposeAllowed(p) {
-			return false
-		}
-	}
-
-	if !c.IsVendorAllowed(id) {
-		return false
 	}
 
 	return true
@@ -177,29 +179,31 @@ func (c *CoreString) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...in
 // Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
 // or if user has given consent in accordance with publisher restrictions
 func (c *CoreString) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
+	if !c.IsVendorAllowed(id) && !c.IsVendorLIAllowed(id) {
+		return false
+	}
+
 	for _, p := range purposeIds {
 		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
 			return false
 		}
 
 		pr := c.GetPubRestrictionsForPurpose(p)
+		if len(pr) == 0 && (!c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p)) {
+			return false
+		}
+
 		for _, r := range pr {
 			if r.IsVendorIncluded(id) {
 				if r.RestrictionType == RestrictionTypeNotAllowed {
 					return false
-				} else if r.RestrictionType == RestrictionTypeRequireConsent && !c.IsVendorAllowed(id) && !c.IsPurposeAllowed(p) {
+				} else if r.RestrictionType == RestrictionTypeRequireConsent && (!c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p)) {
+					return false
+				} else if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
 					return false
 				}
 			}
 		}
-
-		if !c.IsPurposeLIAllowed(p) {
-			return false
-		}
-	}
-
-	if !c.IsVendorLIAllowed(id) {
-		return false
 	}
 
 	return true
