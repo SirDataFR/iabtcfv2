@@ -148,7 +148,7 @@ func DecodeCoreString(coreString string) (c *CoreString, err error) {
 	c.VendorListVersion = e.readInt(bitsVendorListVersion)
 	c.TcfPolicyVersion = e.readInt(bitsTcfPolicyVersion)
 	c.IsServiceSpecific = e.readBool()
-	c.UseNonStandardStacks = e.readBool()
+	c.UseNonStandardTexts = e.readBool()
 	c.SpecialFeatureOptIns = e.readBitField(bitsSpecialFeatureOptIns)
 	c.PurposesConsent = e.readBitField(bitsPurposesConsent)
 	c.PurposesLITransparency = e.readBitField(bitsPurposesLITransparency)

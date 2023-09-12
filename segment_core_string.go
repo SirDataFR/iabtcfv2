@@ -16,7 +16,7 @@ type CoreString struct {
 	VendorListVersion      int
 	TcfPolicyVersion       int
 	IsServiceSpecific      bool
-	UseNonStandardStacks   bool
+	UseNonStandardTexts    bool
 	SpecialFeatureOptIns   map[int]bool
 	PurposesConsent        map[int]bool
 	PurposesLITransparency map[int]bool
@@ -334,7 +334,7 @@ func (c *CoreString) Encode() string {
 	e.writeInt(c.VendorListVersion, bitsVendorListVersion)
 	e.writeInt(c.TcfPolicyVersion, bitsTcfPolicyVersion)
 	e.writeBool(c.IsServiceSpecific)
-	e.writeBool(c.UseNonStandardStacks)
+	e.writeBool(c.UseNonStandardTexts)
 	e.writeBools(c.IsSpecialFeatureAllowed, bitsSpecialFeatureOptIns)
 	e.writeBools(c.IsPurposeAllowed, bitsPurposesConsent)
 	e.writeBools(c.IsPurposeLIAllowed, bitsPurposesLITransparency)
