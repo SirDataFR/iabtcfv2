@@ -1,12 +1,12 @@
 # iab-tcf-v2
-Go client library to read and encode IAB TCF V2.0 TC Strings.
+Go client library to read and encode IAB TCF v2.0 TC Strings.
 ### Installation
 
 ```
 go get github.com/SirDataFR/iabtcfv2
 ```
 
-The package defines a `TCData` structure with the four segments a TC String can contain:
+The package defines a `TCData` structure with the three segments a TC String can contain:
 - `CoreString`
 - `DisclosedVendors`
 - `PublisherTC`
@@ -42,10 +42,10 @@ Use `GetSegmentType(segment string) (segmentType SegmentType, err error)` to rea
 
 You can find more information about segment types [here](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md#disclosed-vendors-oob).
 
-Use `GetVersion(s string) (version TcfVersion, err error)` to read the cookie version from a TC String or a *Core String* segment value. This function also supports TCF V1.1 consent strings:
+Use `GetVersion(s string) (version TcfVersion, err error)` to read the cookie version from a TC String or a *Core String* segment value. This function also supports TCF v1.1 consent strings:
 - `TcfVersionUndefined` = undefined
-- `TcfVersion1` = TCF V1.1
-- `TcfVersion2` = TCF V2.0
+- `TcfVersion1` = TCF v1.1
+- `TcfVersion2` = TCF v2.0
 
 #### Example
 ```
