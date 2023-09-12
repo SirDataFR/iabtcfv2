@@ -43,9 +43,29 @@ type PubRestriction struct {
 	RangeEntries    []*RangeEntry
 }
 
+func (r *PubRestriction) getBitSize() (bitSize int) {
+	bitSize += bitsPubRestrictionsEntryPurposeId
+	bitSize += bitsPubRestrictionsEntryRestrictionType
+	bitSize += bitsNumEntries
+	for _, entry := range r.RangeEntries {
+		bitSize += entry.getBitSize()
+	}
+	return bitSize
+}
+
 type RangeEntry struct {
 	StartVendorID int
 	EndVendorID   int
+}
+
+func (r *RangeEntry) getBitSize() (bitSize int) {
+	bitSize += bitsIsRangeEncoding
+	if r.EndVendorID > r.StartVendorID {
+		bitSize += bitsVendorId * 2
+	} else {
+		bitSize += bitsVendorId
+	}
+	return bitSize
 }
 
 // Returns true if user has given consent to special feature id
@@ -244,19 +264,31 @@ func (p *PubRestriction) IsVendorIncluded(id int) bool {
 
 // Returns structure as a base64 raw url encoded string
 func (c *CoreString) Encode() string {
-	bitSize := 230
+	var bitSize int
+	bitSize += bitsVersion
+	bitSize += bitsCreated
+	bitSize += bitsLastUpdated
+	bitSize += bitsCmpId
+	bitSize += bitsCmpVersion
+	bitSize += bitsConsentScreen
+	bitSize += bitsConsentLanguage
+	bitSize += bitsVendorListVersion
+	bitSize += bitsTcfPolicyVersion
+	bitSize += bitsIsServiceSpecific
+	bitSize += bitsUseNonStandardTexts
+	bitSize += bitsSpecialFeatureOptIns
+	bitSize += bitsPurposesConsent
+	bitSize += bitsPurposesLITransparency
+	bitSize += bitsPurposeOneTreatment
+	bitSize += bitsPublisherCC
 
+	bitSize += bitsMaxVendorId
+	bitSize += bitsIsRangeEncoding
 	if c.IsRangeEncoding {
-		bitSize += 12
-		entriesSize := len(c.RangeEntries)
+		bitSize += bitsNumEntries
 		for _, entry := range c.RangeEntries {
-			if entry.EndVendorID > entry.StartVendorID {
-				entriesSize += 16 * 2
-			} else {
-				entriesSize += 16
-			}
+			bitSize += entry.getBitSize()
 		}
-		bitSize += +entriesSize
 	} else {
 		if c.MaxVendorId == 0 {
 			for id, _ := range c.VendorsConsent {
@@ -268,18 +300,13 @@ func (c *CoreString) Encode() string {
 		bitSize += c.MaxVendorId
 	}
 
-	bitSize += 16
+	bitSize += bitsMaxVendorId
+	bitSize += bitsIsRangeEncoding
 	if c.IsRangeEncodingLI {
-		bitSize += 12
-		entriesSize := len(c.RangeEntriesLI)
+		bitSize += bitsNumEntries
 		for _, entry := range c.RangeEntriesLI {
-			if entry.EndVendorID > entry.StartVendorID {
-				entriesSize += 16 * 2
-			} else {
-				entriesSize += 16
-			}
+			bitSize += entry.getBitSize()
 		}
-		bitSize += entriesSize
 	} else {
 		if c.MaxVendorIdLI == 0 {
 			for id, _ := range c.VendorsLITransparency {
@@ -291,71 +318,45 @@ func (c *CoreString) Encode() string {
 		bitSize += c.MaxVendorIdLI
 	}
 
-	bitSize += 12
-	for _, res := range c.PubRestrictions {
-		entriesSize := 20
-		for _, entry := range res.RangeEntries {
-			entriesSize++
-			if entry.EndVendorID > entry.StartVendorID {
-				entriesSize += 16 * 2
-			} else {
-				entriesSize += 16
-			}
-		}
-		bitSize += entriesSize
+	bitSize += bitsNumPubRestrictions
+	for _, restriction := range c.PubRestrictions {
+		bitSize += restriction.getBitSize()
 	}
 
-	var e = newTCEncoder(make([]byte, bitSize/8))
-	if bitSize%8 != 0 {
-		e = newTCEncoder(make([]byte, bitSize/8+1))
-	}
-
-	e.writeInt(c.Version, 6)
+	e := newTCEncoderFromSize(bitSize)
+	e.writeInt(c.Version, bitsVersion)
 	e.writeTime(c.Created)
 	e.writeTime(c.LastUpdated)
-	e.writeInt(c.CmpId, 12)
-	e.writeInt(c.CmpVersion, 12)
-	e.writeInt(c.ConsentScreen, 6)
-	e.writeIsoCode(c.ConsentLanguage)
-	e.writeInt(c.VendorListVersion, 12)
-	e.writeInt(c.TcfPolicyVersion, 6)
+	e.writeInt(c.CmpId, bitsCmpId)
+	e.writeInt(c.CmpVersion, bitsCmpVersion)
+	e.writeInt(c.ConsentScreen, bitsConsentScreen)
+	e.writeChars(c.ConsentLanguage, bitsConsentLanguage)
+	e.writeInt(c.VendorListVersion, bitsVendorListVersion)
+	e.writeInt(c.TcfPolicyVersion, bitsTcfPolicyVersion)
 	e.writeBool(c.IsServiceSpecific)
 	e.writeBool(c.UseNonStandardStacks)
-	for i := 0; i < 12; i++ {
-		e.writeBool(c.IsSpecialFeatureAllowed(i + 1))
-	}
-	for i := 0; i < 24; i++ {
-		e.writeBool(c.IsPurposeAllowed(i + 1))
-	}
-	for i := 0; i < 24; i++ {
-		e.writeBool(c.IsPurposeLIAllowed(i + 1))
-	}
+	e.writeBools(c.IsSpecialFeatureAllowed, bitsSpecialFeatureOptIns)
+	e.writeBools(c.IsPurposeAllowed, bitsPurposesConsent)
+	e.writeBools(c.IsPurposeLIAllowed, bitsPurposesLITransparency)
 	e.writeBool(c.PurposeOneTreatment)
-	e.writeIsoCode(c.PublisherCC)
+	e.writeChars(c.PublisherCC, bitsPublisherCC)
 
-	e.writeInt(c.MaxVendorId, 16)
+	e.writeInt(c.MaxVendorId, bitsMaxVendorId)
 	e.writeBool(c.IsRangeEncoding)
 	if c.IsRangeEncoding {
-		e.writeInt(len(c.RangeEntries), 12)
 		e.writeRangeEntries(c.RangeEntries)
 	} else {
-		for i := 0; i < c.MaxVendorId; i++ {
-			e.writeBool(c.IsVendorAllowed(i + 1))
-		}
+		e.writeBools(c.IsVendorAllowed, c.MaxVendorId)
 	}
 
-	e.writeInt(c.MaxVendorIdLI, 16)
+	e.writeInt(c.MaxVendorIdLI, bitsMaxVendorId)
 	e.writeBool(c.IsRangeEncodingLI)
 	if c.IsRangeEncodingLI {
-		e.writeInt(len(c.RangeEntriesLI), 12)
 		e.writeRangeEntries(c.RangeEntriesLI)
 	} else {
-		for i := 0; i < c.MaxVendorIdLI; i++ {
-			e.writeBool(c.IsVendorLIAllowed(i + 1))
-		}
+		e.writeBools(c.IsVendorLIAllowed, c.MaxVendorIdLI)
 	}
 
-	e.writeInt(len(c.PubRestrictions), 12)
 	e.writePubRestrictions(c.PubRestrictions)
 
 	return base64.RawURLEncoding.EncodeToString(e.bytes)

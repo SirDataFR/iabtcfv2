@@ -29,19 +29,16 @@ func (a *AllowedVendors) IsVendorAllowed(id int) bool {
 
 // Returns structure as a base64 raw url encoded string
 func (a *AllowedVendors) Encode() string {
-	bitSize := 20
+	var bitSize int
+	bitSize += bitsSegmentType
 
+	bitSize += bitsMaxVendorId
+	bitSize += bitsIsRangeEncoding
 	if a.IsRangeEncoding {
-		bitSize += 12
-		entriesSize := len(a.RangeEntries)
+		bitSize += bitsNumEntries
 		for _, entry := range a.RangeEntries {
-			if entry.EndVendorID > entry.StartVendorID {
-				entriesSize += 16 * 2
-			} else {
-				entriesSize += 16
-			}
+			bitSize += entry.getBitSize()
 		}
-		bitSize += entriesSize
 	} else {
 		if a.MaxVendorId == 0 {
 			for id, _ := range a.AllowedVendors {
@@ -53,21 +50,14 @@ func (a *AllowedVendors) Encode() string {
 		bitSize += a.MaxVendorId
 	}
 
-	var e = newTCEncoder(make([]byte, bitSize/8))
-	if bitSize%8 != 0 {
-		e = newTCEncoder(make([]byte, bitSize/8+1))
-	}
-
-	e.writeInt(a.SegmentType, 3)
-	e.writeInt(a.MaxVendorId, 16)
+	e := newTCEncoderFromSize(bitSize)
+	e.writeInt(a.SegmentType, bitsSegmentType)
+	e.writeInt(a.MaxVendorId, bitsMaxVendorId)
 	e.writeBool(a.IsRangeEncoding)
 	if a.IsRangeEncoding {
-		e.writeInt(len(a.RangeEntries), 12)
 		e.writeRangeEntries(a.RangeEntries)
 	} else {
-		for i := 0; i < a.MaxVendorId; i++ {
-			e.writeBool(a.IsVendorAllowed(i + 1))
-		}
+		e.writeBools(a.IsVendorAllowed, a.MaxVendorId)
 	}
 
 	return base64.RawURLEncoding.EncodeToString(e.bytes)

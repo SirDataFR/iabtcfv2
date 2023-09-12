@@ -17,26 +17,34 @@ func newTCEncoder(src []byte) *TCEncoder {
 	return &TCEncoder{newBits(src)}
 }
 
+func newTCEncoderFromSize(bitSize int) *TCEncoder {
+	if bitSize%8 != 0 {
+		return newTCEncoder(make([]byte, bitSize/8+1))
+	}
+	return newTCEncoder(make([]byte, bitSize/8))
+}
+
 func (r *TCEncoder) readTime() time.Time {
-	var ds = int64(r.readInt(36))
+	var ds = int64(r.readInt(bitsTime))
 	return time.Unix(ds/decisecondsPerSecond, (ds%decisecondsPerSecond)*nanosecondsPerDecisecond).UTC()
 }
 
 func (r *TCEncoder) writeTime(v time.Time) {
-	r.writeNumber(v.UnixNano()/nanosecondsPerDecisecond, 36)
+	r.writeNumber(v.UnixNano()/nanosecondsPerDecisecond, bitsTime)
 }
 
-func (r *TCEncoder) readIsoCode() string {
-	var buf = make([]byte, 0, 2)
-	for i := uint(0); i < 2; i++ {
-		buf = append(buf, byte(r.readInt(6))+'A')
+func (r *TCEncoder) readChars(n uint) string {
+	var buf = make([]byte, 0, n/bitsChar)
+	for i := uint(0); i < n/bitsChar; i++ {
+		buf = append(buf, byte(r.readInt(bitsChar))+'A')
 	}
 	return string(buf)
 }
 
-func (r *TCEncoder) writeIsoCode(v string) {
-	for _, char := range v {
-		r.writeInt(int(byte(char)-'A'), 6)
+func (r *TCEncoder) writeChars(v string, n uint) {
+	for i := uint(0); i < n/bitsChar; i++ {
+		char := v[i]
+		r.writeInt(int(byte(char)-'A'), bitsChar)
 	}
 }
 
@@ -50,56 +58,64 @@ func (r *TCEncoder) readBitField(n uint) map[int]bool {
 	return m
 }
 
+func (b *Bits) writeBools(getBool func(int) bool, n int) {
+	for i := 1; i <= n; i++ {
+		b.writeBool(getBool(i))
+	}
+}
+
 func (r *TCEncoder) writeRangeEntries(entries []*RangeEntry) {
+	r.writeInt(len(entries), bitsNumEntries)
 	for _, entry := range entries {
 		if entry.EndVendorID > entry.StartVendorID {
 			r.writeBool(true)
-			r.writeInt(entry.StartVendorID, 16)
-			r.writeInt(entry.EndVendorID, 16)
+			r.writeInt(entry.StartVendorID, bitsVendorId)
+			r.writeInt(entry.EndVendorID, bitsVendorId)
 		} else {
 			r.writeBool(false)
-			r.writeInt(entry.StartVendorID, 16)
+			r.writeInt(entry.StartVendorID, bitsVendorId)
 		}
 	}
 }
 
-func (r *TCEncoder) readRangeEntries(n uint) []*RangeEntry {
+func (r *TCEncoder) readRangeEntries() (int, []*RangeEntry) {
+	n := r.readInt(bitsNumEntries)
 	var ret = make([]*RangeEntry, 0, n)
-	for i := uint(0); i < n; i++ {
+	for i := uint(0); i < uint(n); i++ {
 		var isRange = r.readBool()
 		var start, end int
-		start = r.readInt(16)
+		start = r.readInt(bitsVendorId)
 		if isRange {
-			end = r.readInt(16)
+			end = r.readInt(bitsVendorId)
 		} else {
 			end = start
 		}
 		ret = append(ret, &RangeEntry{StartVendorID: start, EndVendorID: end})
 	}
-	return ret
+	return n, ret
 }
 
 func (r *TCEncoder) writePubRestrictions(entries []*PubRestriction) {
+	r.writeInt(len(entries), bitsNumPubRestrictions)
 	for _, entry := range entries {
-		r.writeInt(entry.PurposeId, 6)
-		r.writeInt(int(entry.RestrictionType), 2)
-		r.writeInt(len(entry.RangeEntries), 12)
+		r.writeInt(entry.PurposeId, bitsPubRestrictionsEntryPurposeId)
+		r.writeInt(int(entry.RestrictionType), bitsPubRestrictionsEntryRestrictionType)
 		r.writeRangeEntries(entry.RangeEntries)
 	}
 }
 
-func (r *TCEncoder) readPubRestrictions(n uint) []*PubRestriction {
+func (r *TCEncoder) readPubRestrictions() (int, []*PubRestriction) {
+	n := r.readInt(bitsNumPubRestrictions)
 	var ret = make([]*PubRestriction, 0, n)
-	for i := uint(0); i < n; i++ {
-		var purposeId = r.readInt(6)
-		var restrictionType = r.readInt(2)
-		var numEntries = r.readInt(12)
-		var rangeEntries = r.readRangeEntries(uint(numEntries))
+	for i := uint(0); i < uint(n); i++ {
+		var purposeId = r.readInt(bitsPubRestrictionsEntryPurposeId)
+		var restrictionType = r.readInt(bitsPubRestrictionsEntryRestrictionType)
+		numEntries, rangeEntries := r.readRangeEntries()
 		ret = append(ret, &PubRestriction{PurposeId: purposeId,
 			RestrictionType: RestrictionType(restrictionType),
 			NumEntries:      numEntries,
 			RangeEntries:    rangeEntries,
 		})
 	}
-	return ret
+	return n, ret
 }

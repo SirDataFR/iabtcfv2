@@ -35,27 +35,21 @@ func (p *PublisherTC) IsCustomPurposeLIAllowed(id int) bool {
 
 // Returns structure as a base64 raw url encoded string
 func (p *PublisherTC) Encode() string {
-	bitSize := 57 + (p.NumCustomPurposes * 2)
+	var bitSize int
+	bitSize += bitsSegmentType
 
-	var e = newTCEncoder(make([]byte, bitSize/8))
-	if bitSize%8 != 0 {
-		e = newTCEncoder(make([]byte, bitSize/8+1))
-	}
+	bitSize += bitsPubPurposesConsent
+	bitSize += bitsPubPurposesLITransparency
+	bitSize += bitsNumCustomPurposes
+	bitSize += p.NumCustomPurposes * 2
 
-	e.writeInt(p.SegmentType, 3)
-	for i := 0; i < 24; i++ {
-		e.writeBool(p.IsPurposeAllowed(i + 1))
-	}
-	for i := 0; i < 24; i++ {
-		e.writeBool(p.IsPurposeLIAllowed(i + 1))
-	}
-	e.writeInt(p.NumCustomPurposes, 6)
-	for i := 0; i < p.NumCustomPurposes; i++ {
-		e.writeBool(p.IsCustomPurposeAllowed(i + 1))
-	}
-	for i := 0; i < p.NumCustomPurposes; i++ {
-		e.writeBool(p.IsCustomPurposeLIAllowed(i + 1))
-	}
+	e := newTCEncoderFromSize(bitSize)
+	e.writeInt(p.SegmentType, bitsSegmentType)
+	e.writeBools(p.IsPurposeAllowed, bitsPubPurposesConsent)
+	e.writeBools(p.IsPurposeLIAllowed, bitsPubPurposesLITransparency)
+	e.writeInt(p.NumCustomPurposes, bitsNumCustomPurposes)
+	e.writeBools(p.IsCustomPurposeAllowed, p.NumCustomPurposes)
+	e.writeBools(p.IsCustomPurposeLIAllowed, p.NumCustomPurposes)
 
 	return base64.RawURLEncoding.EncodeToString(e.bytes)
 }
