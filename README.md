@@ -9,7 +9,6 @@ go get github.com/SirDataFR/iabtcfv2
 The package defines a `TCData` structure with the four segments a TC String can contain:
 - `CoreString`
 - `DisclosedVendors`
-- `AllowedVendors`
 - `PublisherTC`
 
 ### Decode a TC String
@@ -27,7 +26,6 @@ if err != nil {
 To decode a segment value of a TC String, use the appropriate function:
 - `DecodeCoreString(coreString string) (c *CoreString, err error)`
 - `DecodeDisclosedVendors(disclosedVendors string) (d *DisclosedVendors, err error)`
-- `DecodeAllowedVendors(allowedVendors string) (a *AllowedVendors, err error)`
 - `DecodePublisherTC(publisherTC string) (p *PublisherTC, err error)`
 ```
 var coreString, err = iabtcfv2.DecodeCoreString("COxR03kOxR1CqBcABCENAgCMAP_AAH_AAAqIF3EXySoGY2thI2YVFxBEIYwfJxyigMgChgQIsSwNQIeFLBoGLiAAHBGYJAQAGBAEEACBAQIkHGBMCQAAgAgBiRCMQEGMCzNIBIBAggEbY0FACCVmHkHSmZCY7064O__QLuIJEFQMAkSBAIACLECIQwAQDiAAAYAlAAABAhIaAAgIWBQEeAAAACAwAAgAAABBAAACAAQAAICIAAABAAAgAiAQAAAAGgIQAACBABACRIAAAEANCAAgiCEAQg4EAo4AAA")
@@ -40,7 +38,6 @@ Use `GetSegmentType(segment string) (segmentType SegmentType, err error)` to rea
 - `SegmentTypeUndefined` = undefined
 - `SegmentTypeCoreString` = *Core String*
 - `SegmentTypeDisclosedVendors` = *Disclosed Vendors*
-- `SegmentTypeAllowedVendors` = *Allowed Vendors*
 - `SegmentTypePublisherTC` = *Publisher TC*
 
 You can find more information about segment types [here](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md#disclosed-vendors-oob).
@@ -81,7 +78,6 @@ func main() {
   fmt.Printf("%+v\n", segmentType)
   fmt.Printf("%+v\n", tcData.CoreString)
   fmt.Printf("%+v\n", tcData.DisclosedVendors)
-  fmt.Printf("%+v\n", tcData.AllowedVendors)
   fmt.Printf("%+v\n", tcData.PublisherTC)
 }
 ```
@@ -153,11 +149,6 @@ NOTE: For convenience the `CoreString` functions are also available from the `TC
 | Function                 | Parameter        | Description           |
 | ------------------------ | :--------------: | --------------------- |
 | IsVendorDisclosed        | int | Returns `true` if vendor id is disclosed for validating OOB signaling |
-
-#### AllowedVendors
-| Function                 | Parameter        | Description           |
-| ------------------------ | :--------------: | --------------------- |
-| IsVendorAllowed          | int | Returns `true` if vendor id is allowed for OOB signaling |
 
 #### PublisherTC
 | Function                 | Parameter        | Description           |

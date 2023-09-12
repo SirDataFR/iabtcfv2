@@ -177,47 +177,6 @@ func TestDecodeDisclosedVendors(t *testing.T) {
 	}
 }
 
-func TestDecodeAllowedVendors(t *testing.T) {
-	str := "QF3QAgABAA1A"
-
-	segType, err := GetSegmentType(str)
-	if err != nil {
-		t.Errorf("Segment type should be decoded without error: %s", err)
-		return
-	}
-
-	if segType != SegmentTypeAllowedVendors {
-		t.Errorf("Segment type should be %d", SegmentTypeAllowedVendors)
-		return
-	}
-
-	segment, err := DecodeAllowedVendors(str)
-	if err != nil {
-		t.Errorf("Segment should be decoded without error: %s", err)
-		return
-	}
-
-	if segment.IsVendorAllowed(10) {
-		t.Errorf("Vendor 10 should not be disclosed")
-		return
-	}
-
-	if !segment.IsVendorAllowed(53) {
-		t.Errorf("Vendor 53 should be disclosed")
-		return
-	}
-
-	result := segment.Encode()
-	if result == "" {
-		t.Errorf("Encode() should be produce a string")
-		return
-	}
-
-	if result != str {
-		t.Errorf("Encode() should produce the same string: in = %s, out = %s", str, result)
-	}
-}
-
 func TestDecodePublisherTC(t *testing.T) {
 	str := "elAAAAAAAWA"
 

@@ -6,7 +6,7 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	str := "CPTZZYAPTZZYABcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA.IDaQBQAMgAgABqAR0A2g.QF3QAgABAA1A.eEAAAAAAAUA"
+	str := "CPTZZYAPTZZYABcABCENAgCMAPzAAEPAAAqIDaQBQAMgAgABqAR0A2gDaQAwAMgAgANoAAA.IDaQBQAMgAgABqAR0A2g.eEAAAAAAAUA"
 	data := &TCData{
 		CoreString: &CoreString{
 			Version:             2,
@@ -114,22 +114,6 @@ func TestEncode(t *testing.T) {
 				{
 					StartVendorID: 436,
 					EndVendorID:   436,
-				},
-			},
-		},
-		AllowedVendors: &AllowedVendors{
-			SegmentType:     2,
-			MaxVendorId:     750,
-			IsRangeEncoding: true,
-			NumEntries:      2,
-			RangeEntries: []*RangeEntry{
-				{
-					StartVendorID: 2,
-					EndVendorID:   2,
-				},
-				{
-					StartVendorID: 53,
-					EndVendorID:   53,
 				},
 			},
 		},
@@ -272,31 +256,6 @@ func TestEncodeDisclosedVendors(t *testing.T) {
 			{
 				StartVendorID: 436,
 				EndVendorID:   436,
-			},
-		},
-	}
-
-	result := segment.Encode()
-	if result != str {
-		t.Errorf("Encode() should produce the same string: in = %s, out = %s", str, result)
-	}
-}
-
-func TestEncodeAllowedVendors(t *testing.T) {
-	str := "QF3QAgABAA1A"
-	segment := &AllowedVendors{
-		SegmentType:     2,
-		MaxVendorId:     750,
-		IsRangeEncoding: true,
-		NumEntries:      2,
-		RangeEntries: []*RangeEntry{
-			{
-				StartVendorID: 2,
-				EndVendorID:   2,
-			},
-			{
-				StartVendorID: 53,
-				EndVendorID:   53,
 			},
 		},
 	}

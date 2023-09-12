@@ -36,7 +36,6 @@ func GetVersion(s string) (version TcfVersion, err error) {
 // - SegmentTypeUndefined = -1
 // - SegmentTypeCoreString = 0
 // - SegmentTypeDisclosedVendors = 1
-// - SegmentTypeAllowedVendors = 2
 // - SegmentTypePublisherTC = 3
 func GetSegmentType(segment string) (segmentType SegmentType, err error) {
 	defer func() {
@@ -58,7 +57,6 @@ func GetSegmentType(segment string) (segmentType SegmentType, err error) {
 // A valid TC String must start with a Core String segment
 // A TC String can optionally and arbitrarily ordered contain:
 // - Disclosed Vendors
-// - Allowed Vendors
 // - Publisher TC
 func Decode(tcString string) (t *TCData, err error) {
 	t = &TCData{}
@@ -78,16 +76,6 @@ func Decode(tcString string) (t *TCData, err error) {
 			if err == nil {
 				t.DisclosedVendors = segment
 				mapSegments[SegmentTypeDisclosedVendors] = true
-			}
-			break
-		case SegmentTypeAllowedVendors:
-			if mapSegments[SegmentTypeAllowedVendors] == true {
-				return nil, fmt.Errorf("duplicate Allowed Vendors segment")
-			}
-			segment, err := DecodeAllowedVendors(v)
-			if err == nil {
-				t.AllowedVendors = segment
-				mapSegments[SegmentTypeAllowedVendors] = true
 			}
 			break
 		case SegmentTypePublisherTC:
@@ -207,38 +195,6 @@ func DecodeDisclosedVendors(disclosedVendors string) (d *DisclosedVendors, err e
 	}
 
 	return d, nil
-}
-
-// Decodes a Allowed Vendors value and returns it as a AllowedVendors structure
-func DecodeAllowedVendors(allowedVendors string) (a *AllowedVendors, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-		}
-	}()
-
-	b, err := base64.RawURLEncoding.DecodeString(allowedVendors)
-	if err != nil {
-		return nil, err
-	}
-
-	var e = newTCEncoder(b)
-
-	a = &AllowedVendors{}
-	a.SegmentType = e.readInt(bitsSegmentType)
-	a.MaxVendorId = e.readInt(bitsMaxVendorId)
-	a.IsRangeEncoding = e.readBool()
-	if a.IsRangeEncoding {
-		a.NumEntries, a.RangeEntries = e.readRangeEntries()
-	} else {
-		a.AllowedVendors = e.readBitField(uint(a.MaxVendorId))
-	}
-
-	if a.SegmentType != int(SegmentTypeAllowedVendors) {
-		return nil, fmt.Errorf("allowed vendors segment type must be %d", SegmentTypeAllowedVendors)
-	}
-
-	return a, nil
 }
 
 // Decodes a Publisher TC value and returns it as a PublisherTC structure

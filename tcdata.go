@@ -5,7 +5,6 @@ import "strings"
 type TCData struct {
 	CoreString       *CoreString
 	DisclosedVendors *DisclosedVendors
-	AllowedVendors   *AllowedVendors
 	PublisherTC      *PublisherTC
 }
 
@@ -74,9 +73,6 @@ func (t *TCData) ToTCString() string {
 	}
 	if t.DisclosedVendors != nil {
 		segments = append(segments, t.DisclosedVendors.Encode())
-	}
-	if t.AllowedVendors != nil {
-		segments = append(segments, t.AllowedVendors.Encode())
 	}
 	if t.PublisherTC != nil {
 		segments = append(segments, t.PublisherTC.Encode())
