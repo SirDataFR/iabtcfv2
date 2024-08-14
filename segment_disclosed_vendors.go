@@ -50,15 +50,15 @@ func (d *DisclosedVendors) Encode() string {
 		bitSize += d.MaxVendorId
 	}
 
-	e := newTCEncoderFromSize(bitSize)
-	e.writeInt(d.SegmentType, bitsSegmentType)
-	e.writeInt(d.MaxVendorId, bitsMaxVendorId)
-	e.writeBool(d.IsRangeEncoding)
+	e := NewTCEncoderFromSize(bitSize)
+	e.WriteInt(d.SegmentType, bitsSegmentType)
+	e.WriteInt(d.MaxVendorId, bitsMaxVendorId)
+	e.WriteBool(d.IsRangeEncoding)
 	if d.IsRangeEncoding {
-		e.writeRangeEntries(d.RangeEntries)
+		e.WriteRangeEntries(d.RangeEntries)
 	} else {
-		e.writeBools(d.IsVendorDisclosed, d.MaxVendorId)
+		e.WriteBools(d.IsVendorDisclosed, d.MaxVendorId)
 	}
 
-	return base64.RawURLEncoding.EncodeToString(e.bytes)
+	return base64.RawURLEncoding.EncodeToString(e.Bytes)
 }

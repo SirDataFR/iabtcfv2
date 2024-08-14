@@ -28,8 +28,8 @@ func GetVersion(s string) (version TcfVersion, err error) {
 		return TcfVersionUndefined, err
 	}
 
-	var e = newTCEncoder(b)
-	return TcfVersion(e.readInt(bitsVersion)), nil
+	var e = NewTCEncoder(b)
+	return TcfVersion(e.ReadInt(bitsVersion)), nil
 }
 
 // Decodes a segment value and returns the SegmentType
@@ -49,8 +49,8 @@ func GetSegmentType(segment string) (segmentType SegmentType, err error) {
 		return SegmentTypeUndefined, err
 	}
 
-	var e = newTCEncoder(b)
-	return SegmentType(e.readInt(bitsSegmentType)), nil
+	var e = NewTCEncoder(b)
+	return SegmentType(e.ReadInt(bitsSegmentType)), nil
 }
 
 // Decode a TC String and returns it as a TCData structure
@@ -123,43 +123,43 @@ func DecodeCoreString(coreString string) (c *CoreString, err error) {
 		return nil, err
 	}
 
-	var e = newTCEncoder(b)
+	var e = NewTCEncoder(b)
 
 	c = &CoreString{}
-	c.Version = e.readInt(bitsVersion)
-	c.Created = e.readTime()
-	c.LastUpdated = e.readTime()
-	c.CmpId = e.readInt(bitsCmpId)
-	c.CmpVersion = e.readInt(bitsCmpVersion)
-	c.ConsentScreen = e.readInt(bitsConsentScreen)
-	c.ConsentLanguage = e.readChars(bitsConsentLanguage)
-	c.VendorListVersion = e.readInt(bitsVendorListVersion)
-	c.TcfPolicyVersion = e.readInt(bitsTcfPolicyVersion)
-	c.IsServiceSpecific = e.readBool()
-	c.UseNonStandardTexts = e.readBool()
-	c.SpecialFeatureOptIns = e.readBitField(bitsSpecialFeatureOptIns)
-	c.PurposesConsent = e.readBitField(bitsPurposesConsent)
-	c.PurposesLITransparency = e.readBitField(bitsPurposesLITransparency)
-	c.PurposeOneTreatment = e.readBool()
-	c.PublisherCC = e.readChars(bitsPublisherCC)
+	c.Version = e.ReadInt(bitsVersion)
+	c.Created = e.ReadTime()
+	c.LastUpdated = e.ReadTime()
+	c.CmpId = e.ReadInt(bitsCmpId)
+	c.CmpVersion = e.ReadInt(bitsCmpVersion)
+	c.ConsentScreen = e.ReadInt(bitsConsentScreen)
+	c.ConsentLanguage = e.ReadChars(bitsConsentLanguage)
+	c.VendorListVersion = e.ReadInt(bitsVendorListVersion)
+	c.TcfPolicyVersion = e.ReadInt(bitsTcfPolicyVersion)
+	c.IsServiceSpecific = e.ReadBool()
+	c.UseNonStandardTexts = e.ReadBool()
+	c.SpecialFeatureOptIns = e.ReadBitField(bitsSpecialFeatureOptIns)
+	c.PurposesConsent = e.ReadBitField(bitsPurposesConsent)
+	c.PurposesLITransparency = e.ReadBitField(bitsPurposesLITransparency)
+	c.PurposeOneTreatment = e.ReadBool()
+	c.PublisherCC = e.ReadChars(bitsPublisherCC)
 
-	c.MaxVendorId = e.readInt(bitsMaxVendorId)
-	c.IsRangeEncoding = e.readBool()
+	c.MaxVendorId = e.ReadInt(bitsMaxVendorId)
+	c.IsRangeEncoding = e.ReadBool()
 	if c.IsRangeEncoding {
-		c.NumEntries, c.RangeEntries = e.readRangeEntries()
+		c.NumEntries, c.RangeEntries = e.ReadRangeEntries()
 	} else {
-		c.VendorsConsent = e.readBitField(uint(c.MaxVendorId))
+		c.VendorsConsent = e.ReadBitField(uint(c.MaxVendorId))
 	}
 
-	c.MaxVendorIdLI = e.readInt(bitsMaxVendorId)
-	c.IsRangeEncodingLI = e.readBool()
+	c.MaxVendorIdLI = e.ReadInt(bitsMaxVendorId)
+	c.IsRangeEncodingLI = e.ReadBool()
 	if c.IsRangeEncodingLI {
-		c.NumEntriesLI, c.RangeEntriesLI = e.readRangeEntries()
+		c.NumEntriesLI, c.RangeEntriesLI = e.ReadRangeEntries()
 	} else {
-		c.VendorsLITransparency = e.readBitField(uint(c.MaxVendorIdLI))
+		c.VendorsLITransparency = e.ReadBitField(uint(c.MaxVendorIdLI))
 	}
 
-	c.NumPubRestrictions, c.PubRestrictions = e.readPubRestrictions()
+	c.NumPubRestrictions, c.PubRestrictions = e.ReadPubRestrictions()
 
 	return c, nil
 }
@@ -177,16 +177,16 @@ func DecodeDisclosedVendors(disclosedVendors string) (d *DisclosedVendors, err e
 		return nil, err
 	}
 
-	var e = newTCEncoder(b)
+	var e = NewTCEncoder(b)
 
 	d = &DisclosedVendors{}
-	d.SegmentType = e.readInt(bitsSegmentType)
-	d.MaxVendorId = e.readInt(bitsMaxVendorId)
-	d.IsRangeEncoding = e.readBool()
+	d.SegmentType = e.ReadInt(bitsSegmentType)
+	d.MaxVendorId = e.ReadInt(bitsMaxVendorId)
+	d.IsRangeEncoding = e.ReadBool()
 	if d.IsRangeEncoding {
-		d.NumEntries, d.RangeEntries = e.readRangeEntries()
+		d.NumEntries, d.RangeEntries = e.ReadRangeEntries()
 	} else {
-		d.DisclosedVendors = e.readBitField(uint(d.MaxVendorId))
+		d.DisclosedVendors = e.ReadBitField(uint(d.MaxVendorId))
 	}
 
 	if d.SegmentType != int(SegmentTypeDisclosedVendors) {
@@ -210,15 +210,15 @@ func DecodePublisherTC(publisherTC string) (p *PublisherTC, err error) {
 		return nil, err
 	}
 
-	var e = newTCEncoder(b)
+	var e = NewTCEncoder(b)
 
 	p = &PublisherTC{}
-	p.SegmentType = e.readInt(bitsSegmentType)
-	p.PubPurposesConsent = e.readBitField(bitsPubPurposesConsent)
-	p.PubPurposesLITransparency = e.readBitField(bitsPubPurposesLITransparency)
-	p.NumCustomPurposes = e.readInt(bitsNumCustomPurposes)
-	p.CustomPurposesConsent = e.readBitField(uint(p.NumCustomPurposes))
-	p.CustomPurposesLITransparency = e.readBitField(uint(p.NumCustomPurposes))
+	p.SegmentType = e.ReadInt(bitsSegmentType)
+	p.PubPurposesConsent = e.ReadBitField(bitsPubPurposesConsent)
+	p.PubPurposesLITransparency = e.ReadBitField(bitsPubPurposesLITransparency)
+	p.NumCustomPurposes = e.ReadInt(bitsNumCustomPurposes)
+	p.CustomPurposesConsent = e.ReadBitField(uint(p.NumCustomPurposes))
+	p.CustomPurposesLITransparency = e.ReadBitField(uint(p.NumCustomPurposes))
 
 	if p.SegmentType != int(SegmentTypePublisherTC) {
 		return nil, fmt.Errorf("publisher TC segment type must be %d", SegmentTypePublisherTC)

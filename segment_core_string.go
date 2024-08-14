@@ -323,41 +323,41 @@ func (c *CoreString) Encode() string {
 		bitSize += restriction.getBitSize()
 	}
 
-	e := newTCEncoderFromSize(bitSize)
-	e.writeInt(c.Version, bitsVersion)
-	e.writeTime(c.Created)
-	e.writeTime(c.LastUpdated)
-	e.writeInt(c.CmpId, bitsCmpId)
-	e.writeInt(c.CmpVersion, bitsCmpVersion)
-	e.writeInt(c.ConsentScreen, bitsConsentScreen)
-	e.writeChars(c.ConsentLanguage, bitsConsentLanguage)
-	e.writeInt(c.VendorListVersion, bitsVendorListVersion)
-	e.writeInt(c.TcfPolicyVersion, bitsTcfPolicyVersion)
-	e.writeBool(c.IsServiceSpecific)
-	e.writeBool(c.UseNonStandardTexts)
-	e.writeBools(c.IsSpecialFeatureAllowed, bitsSpecialFeatureOptIns)
-	e.writeBools(c.IsPurposeAllowed, bitsPurposesConsent)
-	e.writeBools(c.IsPurposeLIAllowed, bitsPurposesLITransparency)
-	e.writeBool(c.PurposeOneTreatment)
-	e.writeChars(c.PublisherCC, bitsPublisherCC)
+	e := NewTCEncoderFromSize(bitSize)
+	e.WriteInt(c.Version, bitsVersion)
+	e.WriteTime(c.Created)
+	e.WriteTime(c.LastUpdated)
+	e.WriteInt(c.CmpId, bitsCmpId)
+	e.WriteInt(c.CmpVersion, bitsCmpVersion)
+	e.WriteInt(c.ConsentScreen, bitsConsentScreen)
+	e.WriteChars(c.ConsentLanguage, bitsConsentLanguage)
+	e.WriteInt(c.VendorListVersion, bitsVendorListVersion)
+	e.WriteInt(c.TcfPolicyVersion, bitsTcfPolicyVersion)
+	e.WriteBool(c.IsServiceSpecific)
+	e.WriteBool(c.UseNonStandardTexts)
+	e.WriteBools(c.IsSpecialFeatureAllowed, bitsSpecialFeatureOptIns)
+	e.WriteBools(c.IsPurposeAllowed, bitsPurposesConsent)
+	e.WriteBools(c.IsPurposeLIAllowed, bitsPurposesLITransparency)
+	e.WriteBool(c.PurposeOneTreatment)
+	e.WriteChars(c.PublisherCC, bitsPublisherCC)
 
-	e.writeInt(c.MaxVendorId, bitsMaxVendorId)
-	e.writeBool(c.IsRangeEncoding)
+	e.WriteInt(c.MaxVendorId, bitsMaxVendorId)
+	e.WriteBool(c.IsRangeEncoding)
 	if c.IsRangeEncoding {
-		e.writeRangeEntries(c.RangeEntries)
+		e.WriteRangeEntries(c.RangeEntries)
 	} else {
-		e.writeBools(c.IsVendorAllowed, c.MaxVendorId)
+		e.WriteBools(c.IsVendorAllowed, c.MaxVendorId)
 	}
 
-	e.writeInt(c.MaxVendorIdLI, bitsMaxVendorId)
-	e.writeBool(c.IsRangeEncodingLI)
+	e.WriteInt(c.MaxVendorIdLI, bitsMaxVendorId)
+	e.WriteBool(c.IsRangeEncodingLI)
 	if c.IsRangeEncodingLI {
-		e.writeRangeEntries(c.RangeEntriesLI)
+		e.WriteRangeEntries(c.RangeEntriesLI)
 	} else {
-		e.writeBools(c.IsVendorLIAllowed, c.MaxVendorIdLI)
+		e.WriteBools(c.IsVendorLIAllowed, c.MaxVendorIdLI)
 	}
 
-	e.writePubRestrictions(c.PubRestrictions)
+	e.WritePubRestrictions(c.PubRestrictions)
 
-	return base64.RawURLEncoding.EncodeToString(e.bytes)
+	return base64.RawURLEncoding.EncodeToString(e.Bytes)
 }
