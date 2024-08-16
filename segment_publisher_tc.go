@@ -43,13 +43,13 @@ func (p *PublisherTC) Encode() string {
 	bitSize += bitsNumCustomPurposes
 	bitSize += p.NumCustomPurposes * 2
 
-	e := newTCEncoderFromSize(bitSize)
-	e.writeInt(p.SegmentType, bitsSegmentType)
-	e.writeBools(p.IsPurposeAllowed, bitsPubPurposesConsent)
-	e.writeBools(p.IsPurposeLIAllowed, bitsPubPurposesLITransparency)
-	e.writeInt(p.NumCustomPurposes, bitsNumCustomPurposes)
-	e.writeBools(p.IsCustomPurposeAllowed, p.NumCustomPurposes)
-	e.writeBools(p.IsCustomPurposeLIAllowed, p.NumCustomPurposes)
+	e := NewTCEncoderFromSize(bitSize)
+	e.WriteInt(p.SegmentType, bitsSegmentType)
+	e.WriteBools(p.IsPurposeAllowed, bitsPubPurposesConsent)
+	e.WriteBools(p.IsPurposeLIAllowed, bitsPubPurposesLITransparency)
+	e.WriteInt(p.NumCustomPurposes, bitsNumCustomPurposes)
+	e.WriteBools(p.IsCustomPurposeAllowed, p.NumCustomPurposes)
+	e.WriteBools(p.IsCustomPurposeLIAllowed, p.NumCustomPurposes)
 
-	return base64.RawURLEncoding.EncodeToString(e.bytes)
+	return base64.RawURLEncoding.EncodeToString(e.Bytes)
 }
