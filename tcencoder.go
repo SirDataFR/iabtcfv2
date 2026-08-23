@@ -41,10 +41,17 @@ func (r *TCEncoder) ReadChars(n uint) string {
 	return string(buf)
 }
 
+// WriteChars écrit n/bitsChar caractères, quelle que soit la longueur de v :
+// une valeur plus courte que le champ est complétée par des zéros, une valeur
+// plus longue est tronquée. Le champ a une largeur fixe, et v peut être vide —
+// c'est la valeur par défaut de PublisherCC dans CoreString.
 func (r *TCEncoder) WriteChars(v string, n uint) {
 	for i := uint(0); i < n/bitsChar; i++ {
-		char := v[i]
-		r.WriteInt(int(byte(char)-'A'), bitsChar)
+		var char byte = 'A'
+		if i < uint(len(v)) {
+			char = v[i]
+		}
+		r.WriteInt(int(char-'A'), bitsChar)
 	}
 }
 
