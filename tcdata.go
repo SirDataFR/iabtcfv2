@@ -51,14 +51,16 @@ func (t *TCData) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) bool {
 	return t.CoreString.IsVendorAllowedForPurposesLI(id, purposeIds...)
 }
 
-// Returns true if user has given consent to vendor id processing all purposes ids
-// or if transparency for its legitimate interest is established in accordance with publisher restrictions
+// Returns true if vendor id is allowed for all purpose ids, each one on its legal basis: consent by default, or the
+// basis that a publisher restriction which includes the vendor sets for the purpose. See
+// CoreString.IsVendorAllowedForFlexiblePurposes.
 func (t *TCData) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...int) bool {
 	return t.CoreString.IsVendorAllowedForFlexiblePurposes(id, purposeIds...)
 }
 
-// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
-// or if user has given consent in accordance with publisher restrictions
+// Returns true if vendor id is allowed for all purpose ids, each one on its legal basis: legitimate interest by
+// default, or the basis that a publisher restriction which includes the vendor sets for the purpose. See
+// CoreString.IsVendorAllowedForFlexiblePurposesLI.
 func (t *TCData) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
 	return t.CoreString.IsVendorAllowedForFlexiblePurposesLI(id, purposeIds...)
 }

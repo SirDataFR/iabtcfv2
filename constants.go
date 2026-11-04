@@ -21,6 +21,10 @@ const (
 // TcfPolicyVersion23 is the policy version introduced by TCF v2.3
 const TcfPolicyVersion23 = 5
 
+// tcfPolicyVersion22 is the policy version introduced by TCF v2.2, which deprecates legitimate interest for purposes
+// 3 to 6.
+const tcfPolicyVersion22 = 4
+
 // TcfV23Deadline is the Unix timestamp for the TCF v2.3 policy enforcement deadline (Feb 28, 2026 00:00:00 UTC)
 const TcfV23Deadline int64 = 1772236800
 
