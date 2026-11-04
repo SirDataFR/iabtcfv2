@@ -166,82 +166,69 @@ func (c *CoreString) IsVendorAllowedForPurposesLI(id int, purposeIds ...int) boo
 	return true
 }
 
-// Returns true if user has given consent to vendor id processing all purposes ids
-// or if transparency for its legitimate interest is established in accordance with publisher restrictions
+// Returns true if vendor id is allowed for all purpose ids, each one on its legal basis: consent by default, or the
+// basis that a publisher restriction which includes the vendor sets for the purpose. It is meant for the purposes
+// that the vendor declares flexible in the Global Vendor List, with consent as default legal basis. Legitimate
+// interest never allows purpose 1, nor purposes 3 to 6 from TCF v2.2.
 func (c *CoreString) IsVendorAllowedForFlexiblePurposes(id int, purposeIds ...int) bool {
+	return c.isVendorAllowedForFlexiblePurposes(id, RestrictionTypeRequireConsent, purposeIds)
+}
+
+// Returns true if vendor id is allowed for all purpose ids, each one on its legal basis: legitimate interest by
+// default, or the basis that a publisher restriction which includes the vendor sets for the purpose. It is meant for
+// the purposes that the vendor declares flexible in the Global Vendor List, with legitimate interest as default legal
+// basis. Legitimate interest never allows purpose 1, nor purposes 3 to 6 from TCF v2.2.
+func (c *CoreString) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
+	return c.isVendorAllowedForFlexiblePurposes(id, RestrictionTypeRequireLI, purposeIds)
+}
+
+// isVendorAllowedForFlexiblePurposes checks each purpose on defaultBasis, unless publisher restrictions on the
+// purpose include the vendor: each of them then sets the basis (not allowed, consent or legitimate interest). A
+// restriction that includes other vendors only changes nothing for this one.
+func (c *CoreString) isVendorAllowedForFlexiblePurposes(id int, defaultBasis RestrictionType, purposeIds []int) bool {
 	if !c.IsVendorAllowed(id) && !c.IsVendorLIAllowed(id) {
 		return false
 	}
-
 	for _, p := range purposeIds {
-		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
-			return false
-		}
-
-		pr := c.GetPubRestrictionsForPurpose(p)
-		if len(pr) == 0 && (!c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p)) {
-			return false
-		}
-
-		for _, r := range pr {
+		restricted := false
+		for _, r := range c.GetPubRestrictionsForPurpose(p) {
 			if !r.IsVendorIncluded(id) {
 				continue
 			}
-			switch r.RestrictionType {
-			case RestrictionTypeNotAllowed:
+			restricted = true
+			if !c.isAllowedOnBasis(id, p, r.RestrictionType) {
 				return false
-			case RestrictionTypeRequireConsent:
-				if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
-					return false
-				}
-			case RestrictionTypeRequireLI:
-				if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
-					return false
-				}
 			}
 		}
+		if !restricted && !c.isAllowedOnBasis(id, p, defaultBasis) {
+			return false
+		}
 	}
-
 	return true
 }
 
-// Returns true if transparency for vendor id's legitimate interest is established for all purpose ids
-// or if user has given consent in accordance with publisher restrictions
-func (c *CoreString) IsVendorAllowedForFlexiblePurposesLI(id int, purposeIds ...int) bool {
-	if !c.IsVendorAllowed(id) && !c.IsVendorLIAllowed(id) {
+// isAllowedOnBasis returns true if vendor id and purpose purposeId are both allowed on the legal basis that basis
+// names. A restriction type that allows nothing, or that the specification does not define, allows nothing.
+func (c *CoreString) isAllowedOnBasis(id int, purposeId int, basis RestrictionType) bool {
+	switch basis {
+	case RestrictionTypeRequireConsent:
+		return c.IsVendorAllowed(id) && c.IsPurposeAllowed(purposeId)
+	case RestrictionTypeRequireLI:
+		return c.canBeLegitimateInterest(purposeId) && c.IsVendorLIAllowed(id) && c.IsPurposeLIAllowed(purposeId)
+	default:
 		return false
 	}
+}
 
-	for _, p := range purposeIds {
-		if !c.IsPurposeAllowed(p) && !c.IsPurposeLIAllowed(p) {
-			return false
-		}
-
-		pr := c.GetPubRestrictionsForPurpose(p)
-		if len(pr) == 0 && (!c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p)) {
-			return false
-		}
-
-		for _, r := range pr {
-			if !r.IsVendorIncluded(id) {
-				continue
-			}
-			switch r.RestrictionType {
-			case RestrictionTypeNotAllowed:
-				return false
-			case RestrictionTypeRequireConsent:
-				if !c.IsVendorAllowed(id) || !c.IsPurposeAllowed(p) {
-					return false
-				}
-			case RestrictionTypeRequireLI:
-				if !c.IsVendorLIAllowed(id) || !c.IsPurposeLIAllowed(p) {
-					return false
-				}
-			}
-		}
+// canBeLegitimateInterest returns false for the purposes that the specification never allows on legitimate
+// interest, whatever the bits of the string: purpose 1, always a consent purpose and never flexible, and purposes 3
+// to 6 from TCF v2.2 (policy version 4), whose legitimate interest bits are required to be 0. A restriction that
+// requires legitimate interest for them means that the vendor should not process.
+func (c *CoreString) canBeLegitimateInterest(purposeId int) bool {
+	if purposeId == 1 {
+		return false
 	}
-
-	return true
+	return c.TcfPolicyVersion < tcfPolicyVersion22 || purposeId < 3 || purposeId > 6
 }
 
 // Returns a list of publisher restrictions applied to purpose id
