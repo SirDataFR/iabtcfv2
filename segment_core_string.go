@@ -291,6 +291,10 @@ func (c *CoreString) Encode() string {
 		bitSize += bitsNumEntries
 		for _, entry := range c.RangeEntries {
 			bitSize += entry.getBitSize()
+			// MaxVendorId is the largest vendor id that the section represents: a range past it does not decode.
+			if entry.EndVendorID > c.MaxVendorId {
+				c.MaxVendorId = entry.EndVendorID
+			}
 		}
 	} else {
 		if c.MaxVendorId == 0 {
@@ -309,6 +313,9 @@ func (c *CoreString) Encode() string {
 		bitSize += bitsNumEntries
 		for _, entry := range c.RangeEntriesLI {
 			bitSize += entry.getBitSize()
+			if entry.EndVendorID > c.MaxVendorIdLI {
+				c.MaxVendorIdLI = entry.EndVendorID
+			}
 		}
 	} else {
 		if c.MaxVendorIdLI == 0 {
